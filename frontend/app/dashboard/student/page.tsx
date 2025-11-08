@@ -41,6 +41,14 @@ export default async function StudentDashboard() {
 
   const role = userProfile?.role || 'student'
 
+  // Verify user has appropriate access
+  // Redirect admins and instructors to their respective dashboards
+  if (role === 'admin') {
+    redirect('/dashboard/admin')
+  } else if (role === 'instructor') {
+    redirect('/dashboard/instructor')
+  }
+
   return (
     <RealtimeProvider userId={user.id}>
       <div className="min-h-screen bg-background">
