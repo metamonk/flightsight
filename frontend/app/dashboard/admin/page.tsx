@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { AdminDashboardClient } from './AdminDashboardClient'
+import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -56,9 +57,12 @@ export default async function AdminDashboard() {
       <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
-              🎯 Admin Dashboard
-            </h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
+                🎯 Admin Dashboard
+              </h1>
+              <RoleBadge role="admin" size="sm" />
+            </div>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
           <form>

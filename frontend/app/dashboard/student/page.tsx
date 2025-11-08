@@ -6,6 +6,7 @@ import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { BookingsList } from '@/components/booking/BookingsList'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { ProposalsList } from '@/components/proposals/ProposalsList'
+import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -31,6 +32,15 @@ export default async function StudentDashboard() {
     redirect('/auth/login')
   }
 
+  // Get user role from database
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const role = userProfile?.role || 'student'
+
   return (
     <RealtimeProvider userId={user.id}>
       <div className="min-h-screen bg-background">
@@ -38,9 +48,12 @@ export default async function StudentDashboard() {
         <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
-                ✈️ Student Dashboard
-              </h1>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
+                  ✈️ Student Dashboard
+                </h1>
+                <RoleBadge role={role as 'student' | 'instructor' | 'admin'} size="sm" />
+              </div>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
             <div className="flex items-center gap-4">
