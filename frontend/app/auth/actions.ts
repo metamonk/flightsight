@@ -76,8 +76,17 @@ export async function signup(formData: FormData) {
     redirect(`/auth/register?error=${encodeURIComponent(error.message)}`)
   }
 
-  // Redirect to confirmation page
-  redirect('/auth/register?success=Check your email to confirm your account')
+  // Check if email confirmation is required (set in Supabase dashboard)
+  const requireEmailConfirmation = process.env.NEXT_PUBLIC_REQUIRE_EMAIL_CONFIRMATION === 'true'
+  
+  if (requireEmailConfirmation) {
+    // Redirect to confirmation page
+    redirect('/auth/register?success=Check your email to confirm your account')
+  } else {
+    // Auto-login and redirect to dashboard
+    revalidatePath('/', 'layout')
+    redirect('/auth/login?message=Account created successfully! Please sign in.')
+  }
 }
 
 /**
