@@ -20,7 +20,11 @@ export function InstructorProposalsList({ instructorId }: { instructorId: string
   const rejectMutation = useRejectProposalAsInstructor()
   const [loadingProposalId, setLoadingProposalId] = useState<string | null>(null)
 
-  const handleApprove = async (proposalId: string, bookingId: string) => {
+  const handleApprove = async (proposalId: string, bookingId?: string) => {
+    if (!bookingId) {
+      console.error('Booking ID is required for approval')
+      return
+    }
     setLoadingProposalId(proposalId)
     try {
       await approveMutation.mutateAsync({ proposalId, bookingId })
