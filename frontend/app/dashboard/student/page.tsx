@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { BookingsList } from '@/components/booking/BookingsList'
+import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { ProposalsList } from '@/components/proposals/ProposalsList'
 import { RoleBadge } from '@/components/shared/RoleBadge'
@@ -65,6 +66,11 @@ export default async function StudentDashboard() {
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
             <div className="flex items-center gap-4">
+              <BookingFormDialog>
+                <Button variant="default" size="default">
+                  ✈️ Book a Lesson
+                </Button>
+              </BookingFormDialog>
               <Button variant="outline" size="default" asChild>
                 <Link href="/dashboard/student/calendar">
                   📅 Calendar View

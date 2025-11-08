@@ -384,3 +384,44 @@ export function useRejectProposalAsInstructor() {
   })
 }
 
+/**
+ * Fetch available instructors for booking
+ * Task 22.1
+ */
+export function useInstructors() {
+  return useQuery({
+    queryKey: ['instructors'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, full_name, email, avatar_url')
+        .eq('role', 'instructor')
+        .order('full_name', { ascending: true })
+
+      if (error) throw error
+      return data
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes - instructors don't change frequently
+  })
+}
+
+/**
+ * Fetch available aircraft for booking
+ * Task 22.2
+ */
+export function useAircraft() {
+  return useQuery({
+    queryKey: ['aircraft'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('aircraft')
+        .select('*')
+        .eq('is_active', true)
+        .order('tail_number', { ascending: true })
+
+      if (error) throw error
+      return data
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes - aircraft list changes infrequently
+  })
+}
