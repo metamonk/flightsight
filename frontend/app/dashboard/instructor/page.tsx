@@ -104,7 +104,7 @@ export default async function InstructorDashboard() {
                     Your upcoming lessons with students
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent>
                   <InstructorBookingsList instructorId={user.id} />
                 </CardContent>
               </Card>
@@ -150,7 +150,7 @@ export default async function InstructorDashboard() {
                   Review and approve AI-generated reschedule proposals
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <InstructorProposalsList instructorId={user.id} />
               </CardContent>
             </Card>

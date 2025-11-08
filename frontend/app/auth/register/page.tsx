@@ -31,7 +31,7 @@ export default async function RegisterPage({
         {/* Error Message */}
         {params.error && (
           <Card className="border-destructive/50 bg-destructive/5">
-            <CardContent className="pt-6">
+            <CardContent>
               <p className="text-sm text-destructive">{params.error}</p>
             </CardContent>
           </Card>
@@ -40,7 +40,7 @@ export default async function RegisterPage({
         {/* Success Message */}
         {params.success && (
           <Card className="border-primary/50 bg-primary/5">
-            <CardContent className="pt-6">
+            <CardContent>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-primary">✓ Account created successfully!</p>
                 <p className="text-sm text-primary/80">{params.success}</p>

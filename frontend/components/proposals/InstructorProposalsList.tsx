@@ -55,7 +55,7 @@ export function InstructorProposalsList({ instructorId }: { instructorId: string
   if (error) {
     return (
       <Card className="border-destructive/50 bg-destructive/5">
-        <CardContent className="pt-6">
+        <CardContent>
           <p className="text-destructive font-medium">Error loading proposals</p>
           <p className="text-sm text-muted-foreground mt-1">{(error as Error).message}</p>
         </CardContent>
@@ -116,7 +116,7 @@ export function InstructorProposalsList({ instructorId }: { instructorId: string
             <CardContent className="space-y-4">
               {/* Booking Details */}
               <Card>
-                <CardContent className="pt-4">
+                <CardContent>
                   <p className="font-medium text-foreground mb-1">
                     Student: {booking.student?.name || 'Unknown'}
                   </p>
@@ -132,7 +132,7 @@ export function InstructorProposalsList({ instructorId }: { instructorId: string
               {/* Weather violations */}
               {conflict?.weather_data?.violations && (
                 <Card className="border-destructive/50 bg-destructive/10">
-                  <CardContent className="pt-4">
+                  <CardContent>
                     <p className="text-sm font-medium text-destructive mb-1">
                       Weather Violations:
                     </p>

@@ -34,7 +34,7 @@ export default async function LoginPage({
         {/* Error Message */}
         {params.error && (
           <Card className="border-destructive/50 bg-destructive/5">
-            <CardContent className="pt-6">
+            <CardContent>
               <p className="text-sm text-destructive">{params.error}</p>
             </CardContent>
           </Card>
@@ -43,7 +43,7 @@ export default async function LoginPage({
         {/* Success Message */}
         {params.message && (
           <Card className="border-primary/50 bg-primary/5">
-            <CardContent className="pt-6">
+            <CardContent>
               <p className="text-sm text-primary">{params.message}</p>
             </CardContent>
           </Card>

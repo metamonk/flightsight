@@ -120,7 +120,7 @@ export function ProposalCard({
           : 'hover:border-primary/50 transition-colors'
       }
     >
-      <CardContent className="p-4">
+      <CardContent>
         {/* Rank Badge & Score */}
         <div className="flex items-start justify-between mb-3">
           {variant === 'student' ? (

@@ -24,7 +24,7 @@ interface MetricCardProps {
 export function MetricCard({ title, value, subtitle, icon, trend }: MetricCardProps) {
   return (
     <Card className="hover:shadow-lg transition-all duration-200">
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>

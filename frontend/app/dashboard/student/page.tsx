@@ -107,7 +107,7 @@ export default async function StudentDashboard() {
                     📅 Upcoming Flights
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent>
                   <BookingsList userId={user.id} />
                 </CardContent>
               </Card>
@@ -121,7 +121,7 @@ export default async function StudentDashboard() {
                     🌦️ Weather Alerts
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent>
                   <WeatherAlerts userId={user.id} />
                 </CardContent>
               </Card>
@@ -136,7 +136,7 @@ export default async function StudentDashboard() {
                   🤖 Reschedule Proposals
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <ProposalsList userId={user.id} />
               </CardContent>
             </Card>

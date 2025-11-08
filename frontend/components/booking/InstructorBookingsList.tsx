@@ -20,7 +20,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
-            <CardContent className="pt-6">
+            <CardContent>
               <Skeleton className="h-32 w-full" />
             </CardContent>
           </Card>
@@ -31,7 +31,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
 
   if (error) {
     return (
-      <Card className="text-center py-8">
+      <Card className="text-center">
         <CardContent>
           <p className="text-destructive font-medium">Error loading bookings</p>
           <p className="text-sm text-muted-foreground mt-1">{(error as Error).message}</p>
@@ -42,7 +42,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
 
   if (!bookings || bookings.length === 0) {
     return (
-      <Card className="text-center py-12">
+      <Card className="text-center">
         <CardContent>
           <div className="text-6xl mb-4">📅</div>
           <p className="text-muted-foreground text-lg">No upcoming lessons scheduled</p>
@@ -61,7 +61,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
           key={booking.id}
           className="hover:border-primary/50 hover:shadow-sm transition-all"
         >
-          <CardContent className="pt-6">
+          <CardContent>
             {/* Header with student name and status */}
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -87,7 +87,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
 
             {/* Lesson details */}
             <Card className="bg-muted/50 mb-3">
-              <CardContent className="pt-3 pb-3">
+              <CardContent>
                 <p className="font-medium text-foreground mb-1">
                   {booking.lesson_type.replace('_', ' ').toUpperCase()}
                 </p>
