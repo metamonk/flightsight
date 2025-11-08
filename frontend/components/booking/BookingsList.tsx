@@ -2,7 +2,7 @@
 
 import { useBookings } from '@/lib/queries/bookings'
 import { format } from 'date-fns'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'

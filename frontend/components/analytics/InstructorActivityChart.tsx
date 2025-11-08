@@ -53,7 +53,7 @@ export function InstructorActivityChart({ data }: InstructorActivityChartProps) 
           fill="hsl(var(--chart-1))"
           dataKey="value"
         >
-          {data.map((entry, index) => (
+          {data.map((_entry, index) => (
             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
           ))}
         </Pie>

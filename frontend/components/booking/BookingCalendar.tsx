@@ -6,7 +6,6 @@ import { enUS } from 'date-fns/locale'
 import { useState, useMemo } from 'react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 
 const locales = {
   'en-US': enUS,

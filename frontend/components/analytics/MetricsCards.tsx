@@ -21,7 +21,7 @@ interface MetricCardProps {
  * Displays a single key metric with icon, value, and optional trend indicator
  * Used in the admin dashboard for quick stats overview
  */
-export function MetricCard({ title, value, subtitle, icon, trend, variant = 'default' }: MetricCardProps) {
+export function MetricCard({ title, value, subtitle, icon, trend }: MetricCardProps) {
   return (
     <Card className="hover:shadow-lg transition-all duration-200">
       <CardContent className="pt-6">

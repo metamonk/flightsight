@@ -132,7 +132,7 @@ export function useAcceptProposal() {
       // Show loading toast
       toast.loading('Accepting proposal...', { id: proposalId })
     },
-    onSuccess: (data, proposalId) => {
+    onSuccess: (_data, proposalId) => {
       // Dismiss loading toast and show success
       toast.success('✅ Proposal accepted! Your instructor will be notified.', { 
         id: proposalId,
@@ -180,7 +180,7 @@ export function useRejectProposal() {
     onMutate: async (proposalId) => {
       toast.loading('Rejecting proposal...', { id: proposalId })
     },
-    onSuccess: (data, proposalId) => {
+    onSuccess: (_data, proposalId) => {
       toast.success('Proposal declined', { 
         id: proposalId,
         duration: 3000,
@@ -367,7 +367,7 @@ export function useRejectProposalAsInstructor() {
     onMutate: async (proposalId) => {
       toast.loading('Rejecting proposal...', { id: proposalId })
     },
-    onSuccess: (data, proposalId) => {
+    onSuccess: (_data, proposalId) => {
       toast.success('Proposal rejected', { 
         id: proposalId,
         duration: 3000,

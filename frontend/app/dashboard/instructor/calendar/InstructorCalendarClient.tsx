@@ -7,10 +7,7 @@ import { useInstructorBookings } from '@/lib/queries/bookings'
 import { logout } from '@/app/auth/actions'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface InstructorCalendarClientProps {
   userId: string

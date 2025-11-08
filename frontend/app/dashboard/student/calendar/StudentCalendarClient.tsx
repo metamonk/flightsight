@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import BookingCalendar from '@/components/booking/BookingCalendar'
 import { useBookings } from '@/lib/queries/bookings'
 import { logout } from '@/app/auth/actions'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface StudentCalendarClientProps {
   userId: string
