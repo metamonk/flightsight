@@ -77,7 +77,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-4">
-      {(conflicts as WeatherConflict[]).map((conflict) => (
+      {(conflicts as unknown as WeatherConflict[]).map((conflict) => (
         <Alert key={conflict.id} variant="warning">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle className="flex items-center justify-between">

@@ -113,7 +113,7 @@ export function useRealtimeSubscription(userId: string) {
           filter: `student_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('📅 Booking changed:', payload.eventType, payload.new?.id)
+          console.log('📅 Booking changed:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateBookings()
         }
       )
@@ -127,7 +127,7 @@ export function useRealtimeSubscription(userId: string) {
           table: 'weather_conflicts',
         },
         (payload) => {
-          console.log('⚠️ New weather conflict detected:', payload.new?.id)
+          console.log('⚠️ New weather conflict detected:', (payload.new as any)?.id)
           debouncedInvalidateConflicts()
         }
       )
@@ -141,7 +141,7 @@ export function useRealtimeSubscription(userId: string) {
           table: 'weather_conflicts',
         },
         (payload) => {
-          console.log('✏️ Weather conflict updated:', payload.new?.id, payload.new?.resolved)
+          console.log('✏️ Weather conflict updated:', (payload.new as any)?.id, (payload.new as any)?.resolved)
           debouncedInvalidateConflicts()
         }
       )
@@ -155,7 +155,7 @@ export function useRealtimeSubscription(userId: string) {
           table: 'reschedule_proposals',
         },
         (payload) => {
-          console.log('💡 New proposal received:', payload.new?.id)
+          console.log('💡 New proposal received:', (payload.new as any)?.id)
           debouncedInvalidateProposals()
         }
       )
@@ -169,7 +169,7 @@ export function useRealtimeSubscription(userId: string) {
           table: 'reschedule_proposals',
         },
         (payload) => {
-          console.log('📝 Proposal updated:', payload.new?.id, payload.new?.status)
+          console.log('📝 Proposal updated:', (payload.new as any)?.id, (payload.new as any)?.status)
           debouncedInvalidateProposals()
         }
       )
@@ -297,7 +297,7 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
           filter: `instructor_id=eq.${instructorId}`,
         },
         (payload) => {
-          console.log('👨‍🏫 Instructor booking changed:', payload.eventType, payload.new?.id)
+          console.log('👨‍🏫 Instructor booking changed:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateInstructorBookings()
         }
       )
@@ -311,7 +311,7 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
           table: 'weather_conflicts',
         },
         (payload) => {
-          console.log('⚠️ Weather conflict update:', payload.eventType, payload.new?.id)
+          console.log('⚠️ Weather conflict update:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateConflicts()
           debouncedInvalidateInstructorProposals()
         }
@@ -326,7 +326,7 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
           table: 'reschedule_proposals',
         },
         (payload) => {
-          console.log('📝 Proposal updated for instructor:', payload.new?.id, payload.new?.student_response)
+          console.log('📝 Proposal updated for instructor:', (payload.new as any)?.id, (payload.new as any)?.student_response)
           debouncedInvalidateInstructorProposals()
         }
       )
@@ -457,7 +457,7 @@ export function useAdminRealtimeSubscription() {
           table: 'bookings',
         },
         (payload) => {
-          console.log('🛫 System booking changed:', payload.eventType, payload.new?.id)
+          console.log('🛫 System booking changed:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateAdminBookings()
         }
       )
@@ -471,7 +471,7 @@ export function useAdminRealtimeSubscription() {
           table: 'weather_conflicts',
         },
         (payload) => {
-          console.log('🌦️ System weather conflict:', payload.eventType, payload.new?.id)
+          console.log('🌦️ System weather conflict:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateAdminConflicts()
         }
       )
@@ -485,7 +485,7 @@ export function useAdminRealtimeSubscription() {
           table: 'reschedule_proposals',
         },
         (payload) => {
-          console.log('📊 System proposal update:', payload.eventType, payload.new?.id)
+          console.log('📊 System proposal update:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateAdminProposals()
         }
       )
@@ -499,7 +499,7 @@ export function useAdminRealtimeSubscription() {
           table: 'users',
         },
         (payload) => {
-          console.log('👤 User update:', payload.eventType, payload.new?.id)
+          console.log('👤 User update:', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateAdminUsers()
         }
       )
