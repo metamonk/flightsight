@@ -21,7 +21,7 @@ export async function login(formData: FormData) {
     redirect('/auth/login?error=Missing email or password')
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error, data } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
@@ -30,8 +30,25 @@ export async function login(formData: FormData) {
     redirect(`/auth/login?error=${encodeURIComponent(error.message)}`)
   }
 
+  // Get user role from database to redirect appropriately
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', data.user.id)
+    .single()
+
+  const role = userProfile?.role || 'student'
+
   revalidatePath('/', 'layout')
-  redirect('/dashboard/student')
+  
+  // Redirect based on role
+  if (role === 'admin') {
+    redirect('/dashboard/admin')
+  } else if (role === 'instructor') {
+    redirect('/dashboard/instructor')
+  } else {
+    redirect('/dashboard/student')
+  }
 }
 
 /**
@@ -47,6 +64,7 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
+  const role = (formData.get('role') as string) || 'student' // Get role from form, default to student
 
   // Validate inputs
   if (!email || !password || !confirmPassword) {
@@ -61,13 +79,18 @@ export async function signup(formData: FormData) {
     redirect('/auth/register?error=Password must be at least 6 characters')
   }
 
+  // Validate role
+  if (!['student', 'instructor'].includes(role)) {
+    redirect('/auth/register?error=Invalid role selected')
+  }
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
       data: {
-        role: 'student', // Default role for new users
+        role, // Use selected role
       },
     },
   })

@@ -1,15 +1,12 @@
 import Link from 'next/link'
-import { signup } from '../actions'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { RegisterForm } from './RegisterForm'
 
 /**
  * Registration Page
  * 
- * Allows new users to create an account with email and password.
+ * Allows new users to create an account with email, password, and role selection.
  * Uses Next.js Server Actions for secure, server-side user creation.
  * Styled with shadcn/ui components and custom theme.
  */
@@ -53,89 +50,29 @@ export default async function RegisterPage({
         )}
 
         {/* Registration Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Get started</CardTitle>
-            <CardDescription>Create your account to access FlightSight</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-4">
-              {/* Email Input */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  placeholder="you@example.com"
-                />
-              </div>
+        <RegisterForm />
 
-              {/* Password Input */}
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  placeholder="••••••••"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Must be at least 6 characters
-                </p>
-              </div>
+        {/* Divider & Login Link */}
+        <div className="space-y-4">
+          <div className="relative">
+            <Separator />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-background px-2 text-sm text-muted-foreground">or</span>
+            </div>
+          </div>
 
-              {/* Confirm Password Input */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  minLength={6}
-                  placeholder="••••••••"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                formAction={signup}
-                className="w-full"
-                size="lg"
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <Link
+                href="/auth/login"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
               >
-                Create Account
-              </Button>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <Separator />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="bg-card px-2 text-sm text-muted-foreground">or</span>
-                </div>
-              </div>
-
-              {/* Login Link */}
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{' '}
-                  <Link
-                    href="/auth/login"
-                    className="font-medium text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
 
         {/* Footer */}
         <div className="text-center">
