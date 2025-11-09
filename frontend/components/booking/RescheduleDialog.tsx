@@ -156,8 +156,8 @@ export function RescheduleDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* Only show trigger in uncontrolled mode */}
-      {!isControlled && children && (
+      {/* Render trigger when children are provided (for button-triggered mode) */}
+      {children && (
         <DialogTrigger asChild>
           {children}
         </DialogTrigger>
