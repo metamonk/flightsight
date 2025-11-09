@@ -129,7 +129,7 @@ export default function BookingDetailClient({
     switch (booking.status) {
       case 'pending':
         return <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" />Pending Confirmation</Badge>
-      case 'confirmed':
+      case 'scheduled':
         return <Badge variant="default" className="gap-1"><CheckCircle className="h-3 w-3" />Confirmed</Badge>
       case 'rescheduling':
         return <Badge variant="outline" className="gap-1"><AlertTriangle className="h-3 w-3" />Reschedule Pending</Badge>
@@ -374,7 +374,7 @@ export default function BookingDetailClient({
               </CardHeader>
               <CardContent className="flex flex-wrap gap-3">
                 {/* Reschedule Button */}
-                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                {(booking.status === 'pending' || booking.status === 'scheduled') && (
                   <RescheduleDialog
                     bookingId={booking.id}
                     currentStart={booking.scheduled_start}

@@ -11,8 +11,11 @@ import BookingDetailClient from './BookingDetailClient'
 export default async function BookingDetailPage({ 
   params 
 }: { 
-  params: { id: string } 
+  params: Promise<{ id: string }> 
 }) {
+  // Await params in Next.js 15+
+  const { id } = await params
+  
   const supabase = await createClient()
 
   // Get authenticated user
@@ -56,7 +59,7 @@ export default async function BookingDetailPage({
         year
       )
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error || !booking) {

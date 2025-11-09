@@ -125,11 +125,11 @@ export async function confirmBooking(bookingId: string) {
     }
   }
 
-  // Update booking status to confirmed
+  // Update booking status to scheduled (confirmed by instructor)
   const { error: updateError } = await supabase
     .from('bookings')
     .update({ 
-      status: 'confirmed',
+      status: 'scheduled',
       updated_at: new Date().toISOString(),
     })
     .eq('id', bookingId)
@@ -375,11 +375,11 @@ export async function approveReschedule(bookingId: string) {
     }
   }
 
-  // Update booking status to confirmed
+  // Update booking status to scheduled (approved reschedule)
   const { error: updateError } = await supabase
     .from('bookings')
     .update({ 
-      status: 'confirmed',
+      status: 'scheduled',
       updated_at: new Date().toISOString(),
     })
     .eq('id', bookingId)

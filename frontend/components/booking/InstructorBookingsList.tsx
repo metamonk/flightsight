@@ -110,7 +110,7 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
                   <Badge 
                     variant={
                       hasWeatherIssue ? 'destructive' :
-                      booking.status === 'confirmed' 
+                      booking.status === 'scheduled' 
                         ? 'default' 
                         : booking.status === 'pending'
                         ? 'secondary'
