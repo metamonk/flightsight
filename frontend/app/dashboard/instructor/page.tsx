@@ -70,6 +70,11 @@ export default async function InstructorDashboard() {
                   📅 Calendar View
                 </Link>
               </Button>
+              <Button variant="outline" size="default" asChild>
+                <Link href="/profile">
+                  ⚙️ Settings
+                </Link>
+              </Button>
               <form>
                 <Button
                   formAction={logout}

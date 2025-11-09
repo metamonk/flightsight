@@ -76,6 +76,11 @@ export default async function StudentDashboard() {
                   📅 Calendar View
                 </Link>
               </Button>
+              <Button variant="outline" size="default" asChild>
+                <Link href="/profile">
+                  ⚙️ Settings
+                </Link>
+              </Button>
               <form>
                 <Button
                   formAction={logout}
