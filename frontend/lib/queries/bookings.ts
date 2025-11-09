@@ -61,7 +61,8 @@ export function useWeatherConflicts(userId: string) {
             student:users!bookings_student_id_fkey(id, full_name, email),
             instructor:users!bookings_instructor_id_fkey(id, full_name, email),
             aircraft(*)
-          )
+          ),
+          reschedule_proposals(*)
         `)
         .in('booking_id', bookingIds)
         .is('resolved_at', null)
