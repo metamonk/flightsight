@@ -1,20 +1,22 @@
 'use client'
 
-import { useState } from 'react'
-import { useWeatherConflicts } from '@/lib/queries/bookings'
+import { useWeatherConflicts, useAcceptProposal, useRejectProposal } from '@/lib/queries/bookings'
 import { format } from 'date-fns'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
-import { AlertTriangle, Sparkles, Clock, CloudRain, ChevronRight } from 'lucide-react'
-import { WeatherConflictModal } from './WeatherConflictModal'
+import { AlertTriangle, Sparkles, Clock, CloudRain, Cloud, Wind, Eye, Gauge, Thermometer, Droplets, ChevronDown, ChevronUp } from 'lucide-react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { ProposalCard } from '@/components/proposals/ProposalCard'
+import { useState } from 'react'
 
 /**
- * Weather Alerts Component
+ * Weather Alerts Component with Inline Proposals
  * 
- * Displays active weather conflicts for user's bookings.
+ * Displays active weather conflicts with expandable sections.
+ * When proposals are ready, they appear inline within the alert.
  * Updates in real-time via Supabase Realtime subscriptions.
- * Click any alert to see detailed weather information.
  */
 
 interface WeatherConflict {
@@ -25,6 +27,7 @@ interface WeatherConflict {
   conflict_reasons: string[]
   weather_data: any
   resolved_at?: string
+  reschedule_proposals?: any[]
   booking: {
     id: string
     scheduled_start: string
@@ -50,12 +53,19 @@ interface WeatherConflict {
 
 export function WeatherAlerts({ userId }: { userId: string }) {
   const { data: conflicts, isLoading, error } = useWeatherConflicts(userId)
-  const [selectedConflict, setSelectedConflict] = useState<WeatherConflict | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  const { mutate: acceptProposal, isPending: isAccepting } = useAcceptProposal()
+  const { mutate: rejectProposal, isPending: isRejecting } = useRejectProposal()
 
-  const handleViewDetails = (conflict: WeatherConflict) => {
-    setSelectedConflict(conflict)
-    setModalOpen(true)
+  const handleAccept = (proposalId: string) => {
+    if (confirm('Accept this reschedule proposal?')) {
+      acceptProposal(proposalId)
+    }
+  }
+
+  const handleReject = (proposalId: string) => {
+    if (confirm('Decline this proposal? You can still accept other options.')) {
+      rejectProposal(proposalId)
+    }
   }
 
   if (isLoading) {
@@ -90,87 +100,183 @@ export function WeatherAlerts({ userId }: { userId: string }) {
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        {(conflicts as unknown as WeatherConflict[]).map((conflict) => (
-          <Alert 
-            key={conflict.id} 
-            variant="warning"
-            className="cursor-pointer hover:border-destructive/50 transition-colors"
-            onClick={() => handleViewDetails(conflict)}
-          >
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle className="flex items-center justify-between">
-              Weather Conflict
-              <span className="text-xs font-normal opacity-70">
-                {format(new Date(conflict.booking.scheduled_start), 'MMM d, h:mm a')}
-              </span>
-            </AlertTitle>
-            <AlertDescription>
-              <div className="space-y-2">
-                <p className="text-xs opacity-80">
-                  <CloudRain className="inline h-3 w-3 mr-1" />
-                  {conflict.booking.departure_airport}
-                  {conflict.booking.destination_airport && ` → ${conflict.booking.destination_airport}`}
-                </p>
+    <div className="space-y-4">
+      {(conflicts as unknown as WeatherConflict[]).map((conflict) => {
+        const proposals = (conflict.reschedule_proposals || [])
+          .filter((p: any) => p.student_response !== 'rejected')
+          .sort((a: any, b: any) => (b.score || 0) - (a.score || 0))
+          .slice(0, 3)
 
-                <div className="space-y-1">
-                  {conflict.conflict_reasons.slice(0, 3).map((reason, idx) => (
-                    <p key={idx} className="text-xs">
-                      • {reason}
-                    </p>
-                  ))}
-                  {conflict.conflict_reasons.length > 3 && (
-                    <p className="text-xs italic opacity-70">
-                      + {conflict.conflict_reasons.length - 3} more issues
-                    </p>
+        const hasProposals = proposals.length > 0
+
+        return (
+          <Accordion key={conflict.id} type="single" collapsible>
+            <AccordionItem value={conflict.id} className="border rounded-lg">
+              <AccordionTrigger className="px-4 hover:no-underline [&[data-state=open]]:border-b">
+                <div className="flex items-start justify-between w-full pr-2">
+                  <div className="flex items-start gap-3 text-left">
+                    <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-sm">Weather Conflict Detected</span>
+                        {conflict.status === 'proposals_ready' && (
+                          <Badge variant="default" className="text-xs gap-1">
+                            <Sparkles className="h-3 w-3" />
+                            Proposals Ready
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {conflict.booking.lesson_type} • {format(new Date(conflict.booking.scheduled_start), 'EEE, MMM d, h:mm a')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-4 pt-2">
+                  {/* Flight Details */}
+                  <Card className="bg-muted/30">
+                    <CardContent>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Student</p>
+                          <p className="font-medium">{conflict.booking.student.full_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Instructor</p>
+                          <p className="font-medium">{conflict.booking.instructor.full_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Aircraft</p>
+                          <p className="font-medium">{conflict.booking.aircraft.tail_number}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {conflict.booking.aircraft.make} {conflict.booking.aircraft.model}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Weather Violations */}
+                  <div>
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-destructive" />
+                      Why This Flight Cannot Proceed
+                    </h4>
+                    <div className="space-y-2">
+                      {conflict.conflict_reasons.map((reason, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs bg-destructive/5 border border-destructive/20 rounded-md p-2">
+                          <span className="text-destructive">✕</span>
+                          <span>{reason}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Weather Data */}
+                  {conflict.weather_data && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <Cloud className="h-4 w-4" />
+                        Current Conditions at {conflict.booking.departure_airport}
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <Card className="bg-muted/30">
+                          <CardContent>
+                            <div className="flex items-center gap-2">
+                              <Cloud className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Cloud Cover</p>
+                                <p className="text-sm font-medium">{conflict.weather_data.cloud_cover_percent}%</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-muted/30">
+                          <CardContent>
+                            <div className="flex items-center gap-2">
+                              <Wind className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Wind</p>
+                                <p className="text-sm font-medium">{conflict.weather_data.wind_speed_knots} kts</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-muted/30">
+                          <CardContent>
+                            <div className="flex items-center gap-2">
+                              <Eye className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Visibility</p>
+                                <p className="text-sm font-medium">{conflict.weather_data.visibility_miles} mi</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-muted/30">
+                          <CardContent>
+                            <div className="flex items-center gap-2">
+                              <Gauge className="h-4 w-4 text-muted-foreground" />
+                              <div>
+                                <p className="text-xs text-muted-foreground">Ceiling</p>
+                                <p className="text-sm font-medium">{conflict.weather_data.ceiling_feet} ft</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Proposals Section */}
+                  {conflict.status === 'proposals_ready' && hasProposals && (
+                    <div>
+                      <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        AI-Generated Reschedule Options
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {proposals.map((proposal: any, index: number) => (
+                          <ProposalCard
+                            key={proposal.id}
+                            proposal={{
+                              ...proposal,
+                              conflict,
+                            }}
+                            rank={index}
+                            onAccept={handleAccept}
+                            onReject={handleReject}
+                            isLoading={isAccepting || isRejecting}
+                            variant="student"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Processing Status */}
+                  {conflict.status === 'ai_processing' && (
+                    <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4 animate-pulse" />
+                      <span>AI is generating reschedule proposals...</span>
+                    </div>
+                  )}
+
+                  {conflict.status === 'detected' && (
+                    <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4 animate-pulse" />
+                      <span>Processing weather conflict...</span>
+                    </div>
                   )}
                 </div>
-
-                <div className="flex items-center justify-between mt-3">
-                  {conflict.status === 'proposals_ready' ? (
-                    <span className="text-xs font-medium text-primary flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      AI Proposals Ready
-                    </span>
-                  ) : conflict.status === 'ai_processing' ? (
-                    <span className="text-xs italic text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Generating proposals...
-                    </span>
-                  ) : (
-                    <span className="text-xs italic text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Processing...
-                    </span>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 hover:bg-transparent"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleViewDetails(conflict)
-                    }}
-                  >
-                    <span className="text-xs flex items-center gap-1">
-                      View Details
-                      <ChevronRight className="h-3 w-3" />
-                    </span>
-                  </Button>
-                </div>
-              </div>
-            </AlertDescription>
-          </Alert>
-        ))}
-      </div>
-
-      <WeatherConflictModal
-        conflict={selectedConflict}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-      />
-    </>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )
+      })}
+    </div>
   )
 }
-

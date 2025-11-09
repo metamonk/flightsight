@@ -6,7 +6,6 @@ import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { BookingsList } from '@/components/booking/BookingsList'
 import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
-import { ProposalsList } from '@/components/proposals/ProposalsList'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -124,33 +123,22 @@ export default async function StudentDashboard() {
               </Card>
             </div>
 
-            {/* Weather Alerts */}
+            {/* Weather Alerts with Inline Proposals */}
             <div>
               <Card>
                 <CardHeader className="bg-muted/50">
                   <CardTitle className="text-lg flex items-center gap-2">
                     🌦️ Weather Alerts
                   </CardTitle>
+                  <CardDescription>
+                    Weather conflicts with AI reschedule options
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <WeatherAlerts userId={user.id} />
                 </CardContent>
               </Card>
             </div>
-          </div>
-
-          {/* AI Proposals Section */}
-          <div className="mt-6" data-proposals-section>
-            <Card>
-              <CardHeader className="bg-muted/50">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  🤖 Reschedule Proposals
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ProposalsList userId={user.id} />
-              </CardContent>
-            </Card>
           </div>
         </main>
       </div>
