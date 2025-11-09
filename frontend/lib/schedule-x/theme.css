@@ -1,0 +1,513 @@
+/**
+ * Schedule-X Custom Theme
+ * 
+ * Integrates Schedule-X calendar styling with FlightSight's design system.
+ * Applies custom colors, typography, and styling to match our Tailwind theme.
+ */
+
+/* ========================================
+   Calendar Container & Base Styles
+   ======================================== */
+
+.sx-react-calendar-wrapper {
+  /* Use design system colors */
+  --sx-color-primary: oklch(var(--primary));
+  --sx-color-on-primary: oklch(var(--primary-foreground));
+  --sx-color-secondary: oklch(var(--secondary));
+  --sx-color-on-secondary: oklch(var(--secondary-foreground));
+  --sx-color-accent: oklch(var(--accent));
+  --sx-color-on-accent: oklch(var(--accent-foreground));
+  --sx-color-background: oklch(var(--background));
+  --sx-color-on-background: oklch(var(--foreground));
+  --sx-color-surface: oklch(var(--card));
+  --sx-color-on-surface: oklch(var(--card-foreground));
+  --sx-color-border: oklch(var(--border));
+  --sx-color-muted: oklch(var(--muted));
+  --sx-color-muted-foreground: oklch(var(--muted-foreground));
+  
+  /* Typography */
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  
+  /* Rounded corners to match design system */
+  --sx-border-radius: var(--radius);
+  
+  /* Container styling */
+  background-color: var(--sx-color-background);
+  border: 1px solid var(--sx-color-border);
+  border-radius: var(--sx-border-radius);
+  overflow: hidden;
+}
+
+/* ========================================
+   Calendar Header (Toolbar)
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-calendar-header {
+  background-color: var(--sx-color-surface);
+  border-bottom: 1px solid var(--sx-color-border);
+  padding: 1rem 1.5rem;
+}
+
+.sx-react-calendar-wrapper .sx-calendar-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sx-react-calendar-wrapper .sx-calendar-header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--sx-color-on-surface);
+  font-family: var(--font-sans);
+}
+
+/* Navigation buttons */
+.sx-react-calendar-wrapper .sx-calendar-header button {
+  background-color: var(--sx-color-surface);
+  border: 1px solid var(--sx-color-border);
+  color: var(--sx-color-on-surface);
+  padding: 0.5rem 1rem;
+  border-radius: calc(var(--sx-border-radius) - 2px);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.sx-react-calendar-wrapper .sx-calendar-header button:hover {
+  background-color: var(--sx-color-muted);
+  border-color: oklch(var(--primary));
+}
+
+.sx-react-calendar-wrapper .sx-calendar-header button:active,
+.sx-react-calendar-wrapper .sx-calendar-header button.sx-active {
+  background-color: oklch(var(--primary));
+  color: oklch(var(--primary-foreground));
+  border-color: oklch(var(--primary));
+}
+
+.sx-react-calendar-wrapper .sx-calendar-header button:focus-visible {
+  outline: 2px solid oklch(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ========================================
+   View Switcher
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-view-selection {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background-color: var(--sx-color-muted);
+  border-radius: calc(var(--sx-border-radius) - 2px);
+}
+
+.sx-react-calendar-wrapper .sx-view-selection button {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--sx-color-muted-foreground);
+}
+
+.sx-react-calendar-wrapper .sx-view-selection button.sx-active {
+  background-color: var(--sx-color-surface);
+  color: var(--sx-color-on-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   Week/Day View Grid
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-week-grid,
+.sx-react-calendar-wrapper .sx-day-grid {
+  background-color: var(--sx-color-background);
+}
+
+/* Column headers (days of week) */
+.sx-react-calendar-wrapper .sx-week-grid-day-header,
+.sx-react-calendar-wrapper .sx-day-grid-day-header {
+  background-color: var(--sx-color-muted);
+  border-bottom: 1px solid var(--sx-color-border);
+  padding: 0.75rem 0.5rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sx-color-muted-foreground);
+}
+
+/* Today highlight */
+.sx-react-calendar-wrapper .sx-week-grid-day-header.sx-today,
+.sx-react-calendar-wrapper .sx-day-grid-day-header.sx-today {
+  background-color: oklch(var(--primary) / 0.1);
+  color: oklch(var(--primary));
+}
+
+/* Time axis */
+.sx-react-calendar-wrapper .sx-time-axis {
+  background-color: var(--sx-color-surface);
+  border-right: 1px solid var(--sx-color-border);
+  color: var(--sx-color-muted-foreground);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+.sx-react-calendar-wrapper .sx-time-axis-hour {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Grid lines */
+.sx-react-calendar-wrapper .sx-grid-cell {
+  border: 1px solid oklch(var(--border) / 0.3);
+}
+
+.sx-react-calendar-wrapper .sx-grid-cell:hover {
+  background-color: oklch(var(--accent) / 0.05);
+  cursor: pointer;
+}
+
+/* Current time indicator */
+.sx-react-calendar-wrapper .sx-current-time-indicator {
+  background-color: oklch(var(--destructive));
+  height: 2px;
+  position: relative;
+  z-index: 10;
+}
+
+.sx-react-calendar-wrapper .sx-current-time-indicator::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: oklch(var(--destructive));
+}
+
+/* ========================================
+   Month View
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-month-grid {
+  background-color: var(--sx-color-background);
+}
+
+.sx-react-calendar-wrapper .sx-month-grid-day {
+  border: 1px solid var(--sx-color-border);
+  min-height: 120px;
+  padding: 0.5rem;
+}
+
+.sx-react-calendar-wrapper .sx-month-grid-day.sx-today {
+  background-color: oklch(var(--primary) / 0.05);
+}
+
+.sx-react-calendar-wrapper .sx-month-grid-day.sx-other-month {
+  background-color: var(--sx-color-muted);
+  opacity: 0.5;
+}
+
+.sx-react-calendar-wrapper .sx-month-grid-day-date {
+  font-weight: 600;
+  color: var(--sx-color-on-surface);
+  margin-bottom: 0.5rem;
+}
+
+.sx-react-calendar-wrapper .sx-month-grid-day.sx-today .sx-month-grid-day-date {
+  color: oklch(var(--primary));
+}
+
+/* ========================================
+   Calendar Events
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-event {
+  border-radius: calc(var(--sx-border-radius) - 4px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.sx-react-calendar-wrapper .sx-event:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.sx-react-calendar-wrapper .sx-event:focus-visible {
+  outline: 2px solid oklch(var(--ring));
+  outline-offset: 2px;
+  z-index: 20;
+}
+
+/* Event title */
+.sx-react-calendar-wrapper .sx-event-title {
+  font-weight: 600;
+  margin-bottom: 0.125rem;
+}
+
+/* Event time */
+.sx-react-calendar-wrapper .sx-event-time {
+  font-size: 0.65rem;
+  opacity: 0.9;
+  font-family: var(--font-mono);
+}
+
+/* Multi-day events */
+.sx-react-calendar-wrapper .sx-event.sx-event-continues-previous {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sx-react-calendar-wrapper .sx-event.sx-event-continues-next {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ========================================
+   Event Categories (Status Colors)
+   ======================================== */
+
+/* Scheduled bookings */
+.sx-react-calendar-wrapper .sx-event.sx-event-scheduled {
+  background-color: #10b981; /* green-500 */
+  color: white;
+}
+
+.dark .sx-react-calendar-wrapper .sx-event.sx-event-scheduled {
+  background-color: #6ee7b7; /* green-300 */
+  color: #064e3b; /* green-900 */
+}
+
+/* Pending bookings */
+.sx-react-calendar-wrapper .sx-event.sx-event-pending {
+  background-color: #f59e0b; /* amber-500 */
+  color: white;
+}
+
+.dark .sx-react-calendar-wrapper .sx-event.sx-event-pending {
+  background-color: #fbbf24; /* amber-400 */
+  color: #78350f; /* amber-900 */
+}
+
+/* Weather conflicts */
+.sx-react-calendar-wrapper .sx-event.sx-event-weather-conflict {
+  background-color: #ef4444; /* red-500 */
+  color: white;
+}
+
+.dark .sx-react-calendar-wrapper .sx-event.sx-event-weather-conflict {
+  background-color: #f87171; /* red-400 */
+  color: #7f1d1d; /* red-900 */
+}
+
+/* Cancelled bookings */
+.sx-react-calendar-wrapper .sx-event.sx-event-cancelled {
+  background-color: #6b7280; /* gray-500 */
+  color: white;
+  opacity: 0.7;
+}
+
+.dark .sx-react-calendar-wrapper .sx-event.sx-event-cancelled {
+  background-color: #9ca3af; /* gray-400 */
+  color: #1f2937; /* gray-800 */
+}
+
+/* ========================================
+   Background Events (Weather Conflicts)
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-background-event {
+  pointer-events: none;
+  z-index: 0;
+  border-radius: calc(var(--sx-border-radius) - 4px);
+}
+
+.sx-react-calendar-wrapper .sx-background-event.sx-weather-conflict {
+  background-image: repeating-linear-gradient(
+    45deg,
+    oklch(var(--destructive)) 0,
+    oklch(var(--destructive)) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  opacity: 0.2;
+  border: 1px dashed oklch(var(--destructive));
+}
+
+.sx-react-calendar-wrapper .sx-background-event.sx-weather-conflict:hover {
+  opacity: 0.35;
+  pointer-events: auto;
+  cursor: help;
+}
+
+/* ========================================
+   Drag & Drop
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-event.sx-dragging {
+  opacity: 0.7;
+  cursor: move;
+  z-index: 100;
+}
+
+.sx-react-calendar-wrapper .sx-event.sx-drag-handle {
+  cursor: grab;
+}
+
+.sx-react-calendar-wrapper .sx-event.sx-drag-handle:active {
+  cursor: grabbing;
+}
+
+.sx-react-calendar-wrapper .sx-drop-zone {
+  background-color: oklch(var(--primary) / 0.1);
+  border: 2px dashed oklch(var(--primary));
+  border-radius: calc(var(--sx-border-radius) - 4px);
+}
+
+/* ========================================
+   Popover / Event Details
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-event-popover {
+  background-color: var(--sx-color-surface);
+  border: 1px solid var(--sx-color-border);
+  border-radius: var(--sx-border-radius);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+  max-width: 320px;
+  z-index: 1000;
+}
+
+.sx-react-calendar-wrapper .sx-event-popover-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sx-color-on-surface);
+  margin-bottom: 0.5rem;
+}
+
+.sx-react-calendar-wrapper .sx-event-popover-content {
+  font-size: 0.875rem;
+  color: var(--sx-color-muted-foreground);
+  line-height: 1.6;
+}
+
+/* ========================================
+   Loading & Empty States
+   ======================================== */
+
+.sx-react-calendar-wrapper .sx-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--sx-color-muted-foreground);
+}
+
+.sx-react-calendar-wrapper .sx-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--sx-color-muted-foreground);
+  text-align: center;
+}
+
+.sx-react-calendar-wrapper .sx-empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+
+@media (max-width: 768px) {
+  .sx-react-calendar-wrapper {
+    font-size: 0.75rem;
+  }
+  
+  .sx-react-calendar-wrapper .sx-calendar-header {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .sx-react-calendar-wrapper .sx-calendar-header-title {
+    font-size: 1rem;
+  }
+  
+  .sx-react-calendar-wrapper .sx-calendar-header button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .sx-react-calendar-wrapper .sx-event {
+    font-size: 0.65rem;
+    padding: 0.125rem 0.375rem;
+  }
+  
+  .sx-react-calendar-wrapper .sx-month-grid-day {
+    min-height: 80px;
+    padding: 0.25rem;
+  }
+}
+
+/* ========================================
+   Accessibility Improvements
+   ======================================== */
+
+.sx-react-calendar-wrapper *:focus-visible {
+  outline: 2px solid oklch(var(--ring));
+  outline-offset: 2px;
+}
+
+.sx-react-calendar-wrapper button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Screen reader only text */
+.sx-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+  .sx-react-calendar-wrapper .sx-calendar-header button,
+  .sx-react-calendar-wrapper .sx-view-selection {
+    display: none;
+  }
+  
+  .sx-react-calendar-wrapper {
+    border: none;
+  }
+  
+  .sx-react-calendar-wrapper .sx-event {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+

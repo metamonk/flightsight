@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
-import { BookingsList } from '@/components/booking/BookingsList'
+import { StudentDashboardClient } from './StudentDashboardClient'
 import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { RoleBadge } from '@/components/shared/RoleBadge'
@@ -19,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
  * Features:
  * - Real-time updates via Supabase Realtime
  * - React Query for data fetching and caching
+ * - Calendar and list views for bookings
  * - Responsive layout with Tailwind v4
  */
 export default async function StudentDashboard() {
@@ -109,7 +110,7 @@ export default async function StudentDashboard() {
 
           {/* Dashboard Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Upcoming Flights */}
+            {/* Upcoming Flights - with view toggle */}
             <div className="lg:col-span-2">
               <Card>
                 <CardHeader className="bg-muted/50">
@@ -118,7 +119,7 @@ export default async function StudentDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <BookingsList userId={user.id} />
+                  <StudentDashboardClient userId={user.id} />
                 </CardContent>
               </Card>
             </div>
