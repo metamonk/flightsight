@@ -5,7 +5,7 @@ export const availabilitySchema = z.object({
   day_of_week: z.number().int().min(0).max(6, { message: 'Day of week must be between 0 (Sunday) and 6 (Saturday)' }),
   start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'Start time must be in HH:MM format' }),
   end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: 'End time must be in HH:MM format' }),
-  is_recurring: z.boolean().default(true),
+  is_recurring: z.boolean(),
   valid_from: z.string().optional().nullable(),
   valid_until: z.string().optional().nullable(),
 }).refine(data => {

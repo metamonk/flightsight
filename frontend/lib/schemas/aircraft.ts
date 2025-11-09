@@ -39,7 +39,7 @@ export const aircraftSchema = z.object({
     .optional()
     .nullable(),
   
-  is_active: z.boolean().optional().default(true),
+  is_active: z.boolean(),
   
   maintenance_notes: z
     .string()
@@ -53,28 +53,24 @@ export const aircraftSchema = z.object({
       .number()
       .int()
       .min(0, { message: 'Ceiling must be 0 or greater' })
-      .max(50000, { message: 'Ceiling must be less than 50,000 ft' })
-      .default(3000),
+      .max(50000, { message: 'Ceiling must be less than 50,000 ft' }),
     
     visibility_miles: z
       .number()
       .min(0, { message: 'Visibility must be 0 or greater' })
-      .max(50, { message: 'Visibility must be less than 50 miles' })
-      .default(5),
+      .max(50, { message: 'Visibility must be less than 50 miles' }),
     
     wind_speed_knots: z
       .number()
       .int()
       .min(0, { message: 'Wind speed must be 0 or greater' })
-      .max(200, { message: 'Wind speed must be less than 200 knots' })
-      .default(20),
+      .max(200, { message: 'Wind speed must be less than 200 knots' }),
     
     crosswind_knots: z
       .number()
       .int()
       .min(0, { message: 'Crosswind must be 0 or greater' })
-      .max(100, { message: 'Crosswind must be less than 100 knots' })
-      .default(15),
+      .max(100, { message: 'Crosswind must be less than 100 knots' }),
   }).optional(),
 })
 

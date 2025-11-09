@@ -8,9 +8,7 @@ import {
   useDemoteToStudent,
   useDeactivateUser,
   useReactivateUser,
-  type User, 
-  type UserRole, 
-  type TrainingLevel 
+  TrainingLevel,
 } from '@/lib/queries/users'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { UserEditDialog } from './UserEditDialog'

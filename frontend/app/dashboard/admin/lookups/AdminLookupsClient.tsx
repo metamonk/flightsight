@@ -21,8 +21,8 @@ type LessonType = Database['public']['Tables']['lesson_types']['Row']
 export default function AdminLookupsClient() {
   const [activeTab, setActiveTab] = useState<'airports' | 'lessons'>('airports')
   
-  const { data: airports = [], isLoading: airportsLoading } = useAllAirports()
-  const { data: lessonTypes = [], isLoading: lessonsLoading } = useAllLessonTypes()
+  const { data: airports = [] } = useAllAirports()
+  const { data: lessonTypes = [] } = useAllLessonTypes()
   const deactivateAirport = useDeactivateAirport()
   const reactivateAirport = useReactivateAirport()
   const deactivateLessonType = useDeactivateLessonType()
@@ -102,7 +102,7 @@ export default function AdminLookupsClient() {
   const activeLessonsCount = lessonTypes.filter(l => l.is_active).length
 
   return (
-    <RealtimeProvider channels={['lookups']}>
+    <RealtimeProvider userId="admin-lookups">
       <div className="container mx-auto py-6 space-y-6">
         {/* Header */}
         <div>

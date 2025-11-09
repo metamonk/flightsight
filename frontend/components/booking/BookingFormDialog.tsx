@@ -55,7 +55,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   // Map instructors to a common format
   const instructors = useMemo(() => {
     if (hasTimeSelected && availableInstructors) {
-      return availableInstructors.map(i => ({
+      return availableInstructors.map((i: any) => ({
         id: i.instructor_id,
         full_name: i.instructor_name,
         email: i.instructor_email,
@@ -67,7 +67,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   // Check if selected instructor is still available (after time change)
   useEffect(() => {
     if (hasTimeSelected && formData.instructor_id) {
-      const stillAvailable = instructors.some(i => i.id === formData.instructor_id)
+      const stillAvailable = instructors.some((i: any) => i.id === formData.instructor_id)
       if (!stillAvailable) {
         setFormData(prev => ({ ...prev, instructor_id: undefined }))
         toast.info('Selected instructor is not available at this time')
@@ -184,7 +184,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 {instructorsLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : instructors.length > 0 ? (
-                  instructors.map((instructor) => (
+                  instructors.map((instructor: any) => (
                     <SelectItem key={instructor.id} value={instructor.id}>
                       {instructor.full_name} ({instructor.email})
                     </SelectItem>
@@ -213,7 +213,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 {aircraftLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : aircraft && aircraft.length > 0 ? (
-                  aircraft.map((ac) => (
+                  aircraft.map((ac: any) => (
                     <SelectItem key={ac.id} value={ac.id}>
                       {ac.tail_number} - {ac.make} {ac.model}
                     </SelectItem>
@@ -240,7 +240,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 {lessonTypesLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : lessonTypes && lessonTypes.length > 0 ? (
-                  lessonTypes.map((lt) => (
+                  lessonTypes.map((lt: any) => (
                     <SelectItem key={lt.id} value={lt.name}>
                       {lt.name}
                       {lt.category && <span className="text-muted-foreground text-xs ml-2">({lt.category})</span>}
@@ -288,7 +288,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                   {airportsLoading ? (
                     <SelectItem value="loading" disabled>Loading...</SelectItem>
                   ) : airports && airports.length > 0 ? (
-                    airports.map((airport) => (
+                    airports.map((airport: any) => (
                       <SelectItem key={airport.id} value={airport.code}>
                         {airport.code} - {airport.name}
                         {airport.city && <span className="text-muted-foreground text-xs ml-2">({airport.city})</span>}
@@ -317,10 +317,10 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                   {airportsLoading ? (
                     <SelectItem value="loading" disabled>Loading...</SelectItem>
                   ) : airports && airports.length > 0 ? (
-                    airports.map((airport) => (
-                      <SelectItem key={airport.id} value={airport.code}>
-                        {airport.code} - {airport.name}
-                        {airport.city && <span className="text-muted-foreground text-xs ml-2">({airport.city})</span>}
+                    airports.map((destAirport: any) => (
+                      <SelectItem key={destAirport.id} value={destAirport.code}>
+                        {destAirport.code} - {destAirport.name}
+                        {destAirport.city && <span className="text-muted-foreground text-xs ml-2">({destAirport.city})</span>}
                       </SelectItem>
                     ))
                   ) : (

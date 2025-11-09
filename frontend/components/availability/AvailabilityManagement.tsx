@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import { useUser } from '@/lib/hooks/useUser'
 import { 
-  useInstructorAvailability, 
-  useCreateAvailability, 
-  useUpdateAvailability,
+  useInstructorAvailability,
   useDeleteAvailability 
 } from '@/lib/queries/availability'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,7 +17,7 @@ import type { Database } from '@/lib/types/database.types'
 type AvailabilityPattern = Database['public']['Tables']['availability']['Row']
 
 export function AvailabilityManagement() {
-  const { user } = useUser()
+  const { data: user } = useUser()
   const { data: patterns = [], isLoading } = useInstructorAvailability(user?.id)
   const deleteAvailability = useDeleteAvailability()
   
@@ -77,11 +75,11 @@ export function AvailabilityManagement() {
   }
 
   // Group patterns by day of week
-  const patternsByDay = patterns.reduce((acc, pattern) => {
+  const patternsByDay: Record<number, AvailabilityPattern[]> = patterns.reduce((acc, pattern) => {
     if (!acc[pattern.day_of_week]) {
       acc[pattern.day_of_week] = []
     }
-    acc[pattern.day_of_week].push(pattern)
+    acc[pattern.day_of_week]!.push(pattern)
     return acc
   }, {} as Record<number, AvailabilityPattern[]>)
 
