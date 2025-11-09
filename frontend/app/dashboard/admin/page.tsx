@@ -68,8 +68,18 @@ export default async function AdminDashboard() {
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" size="default" asChild>
+              <Link href="/dashboard/admin/users">
+                👥 Manage Users
+              </Link>
+            </Button>
+            <Button variant="outline" size="default" asChild>
               <Link href="/dashboard/admin/aircraft">
                 ✈️ Manage Aircraft
+              </Link>
+            </Button>
+            <Button variant="outline" size="default" asChild>
+              <Link href="/dashboard/admin/lookups">
+                🗂️ Airports & Lessons
               </Link>
             </Button>
             <form>
