@@ -32,6 +32,58 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
     departure_airport: 'KAUS',
   })
 
+  // Calculate min and max dates for datetime pickers
+  const minDateTime = useMemo(() => {
+    const now = new Date()
+    // Add 1 hour buffer to ensure it's truly in the future
+    now.setHours(now.getHours() + 1)
+    return now.toISOString().slice(0, 16)
+  }, [])
+
+  const maxDateTime = useMemo(() => {
+    const oneYearFromNow = new Date()
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
+    return oneYearFromNow.toISOString().slice(0, 16)
+  }, [])
+
+  // Calculate min end time based on start time (must be at least 15 minutes after)
+  const minEndDateTime = useMemo(() => {
+    if (!formData.scheduled_start) return minDateTime
+    const start = new Date(formData.scheduled_start)
+    start.setMinutes(start.getMinutes() + 15) // Minimum 15 minute duration
+    return start.toISOString().slice(0, 16)
+  }, [formData.scheduled_start, minDateTime])
+
+  // Calculate max end time based on start time (cannot exceed 8 hours)
+  const maxEndDateTime = useMemo(() => {
+    if (!formData.scheduled_start) return maxDateTime
+    const start = new Date(formData.scheduled_start)
+    const eightHoursLater = new Date(start)
+    eightHoursLater.setHours(eightHoursLater.getHours() + 8)
+    // Use the earlier of: 8 hours from start OR max booking date
+    const maxDate = new Date(maxDateTime)
+    return eightHoursLater < maxDate 
+      ? eightHoursLater.toISOString().slice(0, 16)
+      : maxDateTime
+  }, [formData.scheduled_start, maxDateTime])
+
+  // Handle flight type change - auto-clear destination for local flights
+  const handleFlightTypeChange = (newFlightType: string) => {
+    if (newFlightType === 'local') {
+      // Clear destination for local flights
+      setFormData(prev => ({ 
+        ...prev, 
+        flight_type: newFlightType as 'local' | 'short_xc' | 'long_xc',
+        destination_airport: '' 
+      }))
+    } else {
+      setFormData(prev => ({ 
+        ...prev, 
+        flight_type: newFlightType as 'local' | 'short_xc' | 'long_xc'
+      }))
+    }
+  }
+
   // Fetch all instructors (fallback when no time selected)
   const { data: allInstructors, isLoading: allInstructorsLoading } = useInstructors()
   
@@ -47,6 +99,23 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   // Fetch lookup data (airports and lesson types)
   const { data: airports, isLoading: airportsLoading } = useActiveAirports()
   const { data: lessonTypes, isLoading: lessonTypesLoading } = useActiveLessonTypes()
+
+  // Filter out departure airport from destination options
+  const availableDestinations = useMemo(() => {
+    if (!airports || !formData.departure_airport) return airports || []
+    return (airports || []).filter((airport: any) => 
+      airport.code !== formData.departure_airport
+    )
+  }, [airports, formData.departure_airport])
+
+  // Auto-clear destination if it matches departure
+  useEffect(() => {
+    if (formData.destination_airport && 
+        formData.destination_airport === formData.departure_airport) {
+      setFormData(prev => ({ ...prev, destination_airport: '' }))
+      toast.info('Destination cannot be the same as departure')
+    }
+  }, [formData.departure_airport, formData.destination_airport])
 
   // Determine which instructor list to use
   const hasTimeSelected = !!(formData.scheduled_start && formData.scheduled_end)
@@ -148,8 +217,13 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 type="datetime-local"
                 value={formData.scheduled_start?.slice(0, 16) || ''}
                 onChange={(e) => setFormData({ ...formData, scheduled_start: new Date(e.target.value).toISOString() })}
+                min={minDateTime}
+                max={maxDateTime}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Must be at least 1 hour in the future
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="scheduled_end">End Date & Time *</Label>
@@ -158,8 +232,16 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 type="datetime-local"
                 value={formData.scheduled_end?.slice(0, 16) || ''}
                 onChange={(e) => setFormData({ ...formData, scheduled_end: new Date(e.target.value).toISOString() })}
+                min={minEndDateTime}
+                max={maxEndDateTime}
                 required
+                disabled={!formData.scheduled_start}
               />
+              <p className="text-xs text-muted-foreground">
+                {formData.scheduled_start 
+                  ? 'Duration: 15 min - 8 hours' 
+                  : 'Select start time first'}
+              </p>
             </div>
           </div>
 
@@ -258,7 +340,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
             <Label htmlFor="flight_type">Flight Type *</Label>
             <Select
               value={formData.flight_type}
-              onValueChange={(value) => setFormData({ ...formData, flight_type: value as 'local' | 'short_xc' | 'long_xc' })}
+              onValueChange={handleFlightTypeChange}
               required
             >
               <SelectTrigger id="flight_type">
@@ -270,6 +352,11 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 <SelectItem value="long_xc">Long Cross-Country (100+ nm)</SelectItem>
               </SelectContent>
             </Select>
+            {formData.flight_type === 'local' && (
+              <p className="text-xs text-muted-foreground">
+                ℹ️ Local flights do not require a destination
+              </p>
+            )}
           </div>
 
           {/* Airport Fields */}
@@ -308,26 +395,37 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 value={formData.destination_airport}
                 onValueChange={(value) => setFormData({ ...formData, destination_airport: value })}
                 required={formData.flight_type === 'short_xc' || formData.flight_type === 'long_xc'}
-                disabled={formData.flight_type === 'local'}
+                disabled={formData.flight_type === 'local' || !formData.departure_airport}
               >
                 <SelectTrigger id="destination_airport">
-                  <SelectValue placeholder="Select destination airport" />
+                  <SelectValue placeholder={
+                    formData.flight_type === 'local' 
+                      ? 'Not required for local flights' 
+                      : !formData.departure_airport
+                      ? 'Select departure first'
+                      : 'Select destination airport'
+                  } />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
                   {airportsLoading ? (
                     <SelectItem value="loading" disabled>Loading...</SelectItem>
-                  ) : airports && airports.length > 0 ? (
-                    airports.map((destAirport: any) => (
-                      <SelectItem key={destAirport.id} value={destAirport.code}>
-                        {destAirport.code} - {destAirport.name}
-                        {destAirport.city && <span className="text-muted-foreground text-xs ml-2">({destAirport.city})</span>}
+                  ) : availableDestinations && availableDestinations.length > 0 ? (
+                    availableDestinations.map((airport: any) => (
+                      <SelectItem key={airport.id} value={airport.code}>
+                        {airport.code} - {airport.name}
+                        {airport.city && <span className="text-muted-foreground text-xs ml-2">({airport.city})</span>}
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="none" disabled>No airports available</SelectItem>
+                    <SelectItem value="none" disabled>No other airports available</SelectItem>
                   )}
                 </SelectContent>
               </Select>
+              {formData.flight_type !== 'local' && (
+                <p className="text-xs text-muted-foreground">
+                  ℹ️ Must differ from departure airport
+                </p>
+              )}
             </div>
           </div>
 
