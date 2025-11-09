@@ -7,6 +7,7 @@
 export { ScheduleXCalendarWrapper as ScheduleXCalendar } from './ScheduleXCalendar'
 export { InstructorGantt } from './InstructorGantt'
 export { StudentCalendarView } from './StudentCalendarView'
+export { InstructorCalendarView } from './InstructorCalendarView'
 
 // Export types
 export type { ScheduleXCalendarProps } from './ScheduleXCalendar'
@@ -18,4 +19,5 @@ export type {
   GanttItem
 } from './InstructorGantt'
 export type { StudentCalendarViewProps } from './StudentCalendarView'
+export type { InstructorCalendarViewProps } from './InstructorCalendarView'
 
