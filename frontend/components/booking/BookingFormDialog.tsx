@@ -1,35 +1,74 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useInstructors, useAircraft } from '@/lib/queries/bookings'
+import { useAvailableInstructors } from '@/lib/queries/availability'
 import { createBooking } from '@/app/booking/actions'
 import { toast } from 'sonner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
 import type { BookingFormData } from '@/lib/schemas/booking'
 
 /**
  * Booking Form Dialog Component
- * Tasks 22.3 & 22.4
+ * Tasks 22.3 & 22.4 + Task 26.7 (Availability Integration)
  * 
  * Modal form for students to create new flight bookings
+ * Now integrates with instructor availability management
  */
-export function BookingFormDialog({ children }: { children: React.ReactNode }) {
+export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   
-  // Fetch instructors and aircraft
-  const { data: instructors, isLoading: instructorsLoading } = useInstructors()
-  const { data: aircraft, isLoading: aircraftLoading } = useAircraft()
-
   // Form state
   const [formData, setFormData] = useState<Partial<BookingFormData>>({
     flight_type: 'local',
     departure_airport: 'KAUS',
   })
+
+  // Fetch all instructors (fallback when no time selected)
+  const { data: allInstructors, isLoading: allInstructorsLoading } = useInstructors()
+  
+  // Fetch available instructors based on selected time
+  const { data: availableInstructors, isLoading: availableInstructorsLoading } = useAvailableInstructors(
+    formData.scheduled_start,
+    formData.scheduled_end
+  )
+  
+  // Fetch aircraft
+  const { data: aircraft, isLoading: aircraftLoading } = useAircraft()
+
+  // Determine which instructor list to use
+  const hasTimeSelected = !!(formData.scheduled_start && formData.scheduled_end)
+  const instructorsLoading = hasTimeSelected ? availableInstructorsLoading : allInstructorsLoading
+
+  // Map instructors to a common format
+  const instructors = useMemo(() => {
+    if (hasTimeSelected && availableInstructors) {
+      return availableInstructors.map(i => ({
+        id: i.instructor_id,
+        full_name: i.instructor_name,
+        email: i.instructor_email,
+      }))
+    }
+    return allInstructors || []
+  }, [hasTimeSelected, availableInstructors, allInstructors])
+
+  // Check if selected instructor is still available (after time change)
+  useEffect(() => {
+    if (hasTimeSelected && formData.instructor_id) {
+      const stillAvailable = instructors.some(i => i.id === formData.instructor_id)
+      if (!stillAvailable) {
+        setFormData(prev => ({ ...prev, instructor_id: undefined }))
+        toast.info('Selected instructor is not available at this time')
+      }
+    }
+  }, [hasTimeSelected, formData.instructor_id, instructors])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,28 +118,76 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Availability Info Alert */}
+          {hasTimeSelected && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                {instructorsLoading ? (
+                  'Checking instructor availability...'
+                ) : instructors.length > 0 ? (
+                  `${instructors.length} instructor${instructors.length === 1 ? '' : 's'} available for the selected time`
+                ) : (
+                  'No instructors available for the selected time. Try a different date/time or check instructor availability schedules.'
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Date/Time - Moved to top for better UX */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="scheduled_start">Start Date & Time *</Label>
+              <Input
+                id="scheduled_start"
+                type="datetime-local"
+                value={formData.scheduled_start?.slice(0, 16) || ''}
+                onChange={(e) => setFormData({ ...formData, scheduled_start: new Date(e.target.value).toISOString() })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="scheduled_end">End Date & Time *</Label>
+              <Input
+                id="scheduled_end"
+                type="datetime-local"
+                value={formData.scheduled_end?.slice(0, 16) || ''}
+                onChange={(e) => setFormData({ ...formData, scheduled_end: new Date(e.target.value).toISOString() })}
+                required
+              />
+            </div>
+          </div>
+
           {/* Instructor Selection */}
           <div className="space-y-2">
             <Label htmlFor="instructor">Flight Instructor *</Label>
+            {!hasTimeSelected && (
+              <p className="text-sm text-muted-foreground mb-2">
+                💡 Select a date and time first to see only available instructors
+              </p>
+            )}
             <Select
               value={formData.instructor_id}
               onValueChange={(value) => setFormData({ ...formData, instructor_id: value })}
               required
+              disabled={!hasTimeSelected}
             >
               <SelectTrigger id="instructor">
-                <SelectValue placeholder="Select an instructor" />
+                <SelectValue placeholder={hasTimeSelected ? "Select an available instructor" : "Select date/time first"} />
               </SelectTrigger>
               <SelectContent>
                 {instructorsLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
-                ) : instructors && instructors.length > 0 ? (
+                ) : instructors.length > 0 ? (
                   instructors.map((instructor) => (
                     <SelectItem key={instructor.id} value={instructor.id}>
                       {instructor.full_name} ({instructor.email})
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="none" disabled>No instructors available</SelectItem>
+                  <SelectItem value="none" disabled>
+                    {hasTimeSelected ? 'No instructors available at this time' : 'No instructors found'}
+                  </SelectItem>
                 )}
               </SelectContent>
             </Select>
@@ -133,31 +220,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
             </Select>
           </div>
 
-          {/* Date/Time - Task 22.7 (simplified for now) */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="scheduled_start">Start Date & Time *</Label>
-              <Input
-                id="scheduled_start"
-                type="datetime-local"
-                value={formData.scheduled_start?.slice(0, 16) || ''}
-                onChange={(e) => setFormData({ ...formData, scheduled_start: new Date(e.target.value).toISOString() })}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="scheduled_end">End Date & Time *</Label>
-              <Input
-                id="scheduled_end"
-                type="datetime-local"
-                value={formData.scheduled_end?.slice(0, 16) || ''}
-                onChange={(e) => setFormData({ ...formData, scheduled_end: new Date(e.target.value).toISOString() })}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Lesson Type - Task 22.8 */}
+          {/* Lesson Type */}
           <div className="space-y-2">
             <Label htmlFor="lesson_type">Lesson Type *</Label>
             <Input
@@ -169,7 +232,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
             />
           </div>
 
-          {/* Flight Type - Task 22.9 */}
+          {/* Flight Type */}
           <div className="space-y-2">
             <Label htmlFor="flight_type">Flight Type *</Label>
             <Select
@@ -188,7 +251,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
             </Select>
           </div>
 
-          {/* Airport Fields - Task 22.10 */}
+          {/* Airport Fields */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="departure_airport">Departure Airport *</Label>
@@ -240,7 +303,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || instructorsLoading || aircraftLoading}
+              disabled={isSubmitting || instructorsLoading || aircraftLoading || (hasTimeSelected && instructors.length === 0)}
             >
               {isSubmitting ? 'Booking...' : 'Book Lesson'}
             </Button>
@@ -250,4 +313,3 @@ export function BookingFormDialog({ children }: { children: React.ReactNode }) {
     </Dialog>
   )
 }
-
