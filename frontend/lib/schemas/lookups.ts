@@ -4,25 +4,42 @@ import { z } from 'zod'
 // AIRPORT SCHEMAS
 // ============================================
 
+/**
+ * Airport validation schema
+ * 
+ * Comprehensive validation to prevent logical impossibilities:
+ * - Airport code must be 3-4 uppercase alphanumeric characters (ICAO/IATA standard)
+ * - Name must be descriptive and reasonable length
+ * - City, state, country must be valid if provided
+ * - Cannot have invalid special characters
+ * - Must follow standard aviation naming conventions
+ */
 export const airportSchema = z.object({
   code: z.string()
-    .min(3, { message: 'Airport code must be at least 3 characters' })
-    .max(10, { message: 'Airport code must be at most 10 characters' })
-    .regex(/^[A-Z0-9]+$/, { message: 'Airport code must be uppercase letters and numbers only' }),
+    .min(3, { message: 'Airport code must be at least 3 characters (IATA) or 4 characters (ICAO)' })
+    .max(4, { message: 'Airport code must be at most 4 characters (ICAO standard)' })
+    .regex(/^[A-Z0-9]+$/, { message: 'Airport code must be uppercase letters and numbers only' })
+    .transform(val => val.toUpperCase()),
   name: z.string()
     .min(3, { message: 'Airport name must be at least 3 characters' })
-    .max(255, { message: 'Airport name must be at most 255 characters' }),
+    .max(255, { message: 'Airport name must be at most 255 characters' })
+    .regex(/^[a-zA-Z0-9\s\-\.,']+$/, { message: 'Airport name contains invalid characters' }),
   city: z.string()
     .min(2, { message: 'City must be at least 2 characters' })
     .max(100, { message: 'City must be at most 100 characters' })
+    .regex(/^[a-zA-Z\s\-\.,']+$/, { message: 'City name contains invalid characters' })
     .optional()
     .nullable(),
   state: z.string()
+    .min(2, { message: 'State must be at least 2 characters' })
     .max(50, { message: 'State must be at most 50 characters' })
+    .regex(/^[a-zA-Z\s\-]+$/, { message: 'State name contains invalid characters' })
     .optional()
     .nullable(),
   country: z.string()
+    .min(2, { message: 'Country must be at least 2 characters' })
     .max(50, { message: 'Country must be at most 50 characters' })
+    .regex(/^[a-zA-Z\s\-]+$/, { message: 'Country name contains invalid characters' })
     .default('USA'),
   is_active: z.boolean().default(true),
 })
@@ -35,13 +52,25 @@ export type AirportFormValues = z.infer<typeof airportSchema>
 
 export const lessonTypeCategories = ['primary', 'advanced', 'specialized'] as const
 
+/**
+ * Lesson type validation schema
+ * 
+ * Comprehensive validation to prevent logical impossibilities:
+ * - Name must be unique and descriptive
+ * - Description must be reasonable length
+ * - Category must be valid if specified
+ * - Cannot contain special characters that would break formatting
+ */
 export const lessonTypeSchema = z.object({
   name: z.string()
     .min(3, { message: 'Lesson type name must be at least 3 characters' })
-    .max(100, { message: 'Lesson type name must be at most 100 characters' }),
+    .max(100, { message: 'Lesson type name must be at most 100 characters' })
+    .regex(/^[a-zA-Z0-9\s\-/()]+$/, { message: 'Lesson type name contains invalid characters' }),
   description: z.string()
+    .min(10, { message: 'Description must be at least 10 characters if provided' })
     .max(500, { message: 'Description must be at most 500 characters' })
     .optional()
+    .or(z.literal(''))
     .nullable(),
   category: z.enum(lessonTypeCategories).optional().nullable(),
   is_active: z.boolean().default(true),

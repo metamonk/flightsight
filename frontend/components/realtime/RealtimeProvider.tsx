@@ -103,7 +103,7 @@ export function useRealtimeSubscription(userId: string) {
     const channel = supabase
       .channel(`user-${userId}-updates`)
 
-      // Listen for booking changes
+      // Listen for booking changes where user is the student
       .on(
         'postgres_changes',
         {
@@ -113,7 +113,22 @@ export function useRealtimeSubscription(userId: string) {
           filter: `student_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('📅 Booking changed:', payload.eventType, (payload.new as any)?.id)
+          console.log('📅 Booking changed (as student):', payload.eventType, (payload.new as any)?.id)
+          debouncedInvalidateBookings()
+        }
+      )
+
+      // Also listen for bookings where user is the instructor
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+          filter: `instructor_id=eq.${userId}`,
+        },
+        (payload) => {
+          console.log('📅 Booking changed (as instructor):', payload.eventType, (payload.new as any)?.id)
           debouncedInvalidateBookings()
         }
       )

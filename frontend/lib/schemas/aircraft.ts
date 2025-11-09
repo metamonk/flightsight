@@ -1,6 +1,15 @@
 import { z } from 'zod'
 
-// Aircraft schema for add/edit forms
+/**
+ * Aircraft schema for add/edit forms
+ * 
+ * Comprehensive validation to prevent logical impossibilities:
+ * - Year must be between 1900 and current year + 1
+ * - Hourly rate must be positive and reasonable
+ * - Weather minimums must be logically valid
+ * - Crosswind cannot exceed total wind speed
+ * - Ceiling and visibility must be reasonable values
+ */
 export const aircraftSchema = z.object({
   tail_number: z
     .string()
@@ -35,6 +44,7 @@ export const aircraftSchema = z.object({
   hourly_rate: z
     .number()
     .positive({ message: 'Hourly rate must be positive' })
+    .min(10, { message: 'Hourly rate must be at least $10' })
     .max(10000, { message: 'Hourly rate must be less than $10,000' })
     .optional()
     .nullable(),
@@ -57,7 +67,8 @@ export const aircraftSchema = z.object({
     
     visibility_miles: z
       .number()
-      .min(0, { message: 'Visibility must be 0 or greater' })
+      .positive({ message: 'Visibility must be greater than 0' })
+      .min(0.25, { message: 'Visibility must be at least 0.25 miles' })
       .max(50, { message: 'Visibility must be less than 50 miles' }),
     
     wind_speed_knots: z
@@ -73,6 +84,20 @@ export const aircraftSchema = z.object({
       .max(100, { message: 'Crosswind must be less than 100 knots' }),
   }).optional(),
 })
+  // Validation: Crosswind cannot exceed total wind speed
+  .refine(
+    (data) => {
+      if (data.minimum_weather_requirements) {
+        const { wind_speed_knots, crosswind_knots } = data.minimum_weather_requirements
+        return crosswind_knots <= wind_speed_knots
+      }
+      return true
+    },
+    {
+      message: 'Crosswind limit cannot exceed total wind speed limit',
+      path: ['minimum_weather_requirements', 'crosswind_knots'],
+    }
+  )
 
 export type AircraftFormValues = z.infer<typeof aircraftSchema>
 
