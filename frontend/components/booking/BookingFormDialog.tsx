@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useInstructors, useAircraft } from '@/lib/queries/bookings'
 import { useAvailableInstructors } from '@/lib/queries/availability'
+import { useActiveAirports, useActiveLessonTypes } from '@/lib/queries/lookups'
 import { createBooking } from '@/app/booking/actions'
 import { toast } from 'sonner'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -42,6 +43,10 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   
   // Fetch aircraft
   const { data: aircraft, isLoading: aircraftLoading } = useAircraft()
+  
+  // Fetch lookup data (airports and lesson types)
+  const { data: airports, isLoading: airportsLoading } = useActiveAirports()
+  const { data: lessonTypes, isLoading: lessonTypesLoading } = useActiveLessonTypes()
 
   // Determine which instructor list to use
   const hasTimeSelected = !!(formData.scheduled_start && formData.scheduled_end)
@@ -223,13 +228,29 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
           {/* Lesson Type */}
           <div className="space-y-2">
             <Label htmlFor="lesson_type">Lesson Type *</Label>
-            <Input
-              id="lesson_type"
-              placeholder="e.g., Pattern Work, Touch & Goes, Cross Country"
-              value={formData.lesson_type || ''}
-              onChange={(e) => setFormData({ ...formData, lesson_type: e.target.value })}
+            <Select
+              value={formData.lesson_type}
+              onValueChange={(value) => setFormData({ ...formData, lesson_type: value })}
               required
-            />
+            >
+              <SelectTrigger id="lesson_type">
+                <SelectValue placeholder="Select a lesson type" />
+              </SelectTrigger>
+              <SelectContent>
+                {lessonTypesLoading ? (
+                  <SelectItem value="loading" disabled>Loading...</SelectItem>
+                ) : lessonTypes && lessonTypes.length > 0 ? (
+                  lessonTypes.map((lt) => (
+                    <SelectItem key={lt.id} value={lt.name}>
+                      {lt.name}
+                      {lt.category && <span className="text-muted-foreground text-xs ml-2">({lt.category})</span>}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>No lesson types available</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Flight Type */}
@@ -255,28 +276,58 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="departure_airport">Departure Airport *</Label>
-              <Input
-                id="departure_airport"
-                placeholder="KAUS"
-                maxLength={4}
-                value={formData.departure_airport || ''}
-                onChange={(e) => setFormData({ ...formData, departure_airport: e.target.value.toUpperCase() })}
+              <Select
+                value={formData.departure_airport}
+                onValueChange={(value) => setFormData({ ...formData, departure_airport: value })}
                 required
-              />
+              >
+                <SelectTrigger id="departure_airport">
+                  <SelectValue placeholder="Select departure airport" />
+                </SelectTrigger>
+                <SelectContent>
+                  {airportsLoading ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : airports && airports.length > 0 ? (
+                    airports.map((airport) => (
+                      <SelectItem key={airport.id} value={airport.code}>
+                        {airport.code} - {airport.name}
+                        {airport.city && <span className="text-muted-foreground text-xs ml-2">({airport.city})</span>}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>No airports available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="destination_airport">
                 Destination Airport {(formData.flight_type === 'short_xc' || formData.flight_type === 'long_xc') && '*'}
               </Label>
-              <Input
-                id="destination_airport"
-                placeholder="KSAT"
-                maxLength={4}
-                value={formData.destination_airport || ''}
-                onChange={(e) => setFormData({ ...formData, destination_airport: e.target.value.toUpperCase() })}
+              <Select
+                value={formData.destination_airport}
+                onValueChange={(value) => setFormData({ ...formData, destination_airport: value })}
                 required={formData.flight_type === 'short_xc' || formData.flight_type === 'long_xc'}
                 disabled={formData.flight_type === 'local'}
-              />
+              >
+                <SelectTrigger id="destination_airport">
+                  <SelectValue placeholder="Select destination airport" />
+                </SelectTrigger>
+                <SelectContent>
+                  {airportsLoading ? (
+                    <SelectItem value="loading" disabled>Loading...</SelectItem>
+                  ) : airports && airports.length > 0 ? (
+                    airports.map((airport) => (
+                      <SelectItem key={airport.id} value={airport.code}>
+                        {airport.code} - {airport.name}
+                        {airport.city && <span className="text-muted-foreground text-xs ml-2">({airport.city})</span>}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>No airports available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -303,7 +354,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || instructorsLoading || aircraftLoading || (hasTimeSelected && instructors.length === 0)}
+              disabled={isSubmitting || instructorsLoading || aircraftLoading || airportsLoading || lessonTypesLoading || (hasTimeSelected && instructors.length === 0)}
             >
               {isSubmitting ? 'Booking...' : 'Book Lesson'}
             </Button>
