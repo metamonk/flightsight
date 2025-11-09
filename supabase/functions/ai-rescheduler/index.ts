@@ -3,12 +3,14 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { isSlotWeatherSafe } from '../_shared/weather-utils.ts'
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')!
 const OPENAI_MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-4'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const QSTASH_TOKEN = Deno.env.get('QSTASH_TOKEN')!
+const WEATHER_API_KEY = Deno.env.get('WEATHER_API_KEY')!
 
 interface RescheduleProposal {
   proposed_start: string
@@ -215,7 +217,28 @@ async function findAvailableTimeSlots(
   }
   
   console.log(`Found ${slots.length} available time slots`)
-  return slots.slice(0, 20) // Limit to 20 slots for AI processing
+  
+  // Filter slots by weather safety
+  console.log('Checking weather for available slots...')
+  const weatherSafeSlots = []
+  
+  for (const slot of slots.slice(0, 20)) { // Check up to 20 slots
+    const { safe } = await isSlotWeatherSafe(
+      new Date(slot.start),
+      booking.departure_airport,
+      booking.student.training_level || 'student_pilot',
+      booking.aircraft.minimum_weather_requirements,
+      WEATHER_API_KEY
+    )
+    
+    if (safe) {
+      weatherSafeSlots.push(slot)
+    }
+  }
+  
+  console.log(`Found ${weatherSafeSlots.length} weather-safe slots out of ${Math.min(slots.length, 20)} checked`)
+  
+  return weatherSafeSlots
 }
 
 async function generateAIProposals(
