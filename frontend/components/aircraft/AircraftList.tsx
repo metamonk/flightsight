@@ -24,7 +24,7 @@ import { Plus, Search, MoreVertical, Edit, Power, PowerOff } from 'lucide-react'
 import { AircraftFormDialog } from './AircraftFormDialog'
 import { toast } from 'sonner'
 import { formatHourlyRate, getAircraftStatusLabel, getAircraftStatusVariant } from '@/lib/schemas/aircraft'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type Aircraft = Database['public']['Tables']['aircraft']['Row']
 

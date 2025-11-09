@@ -1,19 +1,102 @@
 'use client'
 
 import { useState } from 'react'
-import { useAllAirports, useAllLessonTypes } from '@/lib/queries/lookups'
+import { useAllAirports, useAllLessonTypes, useDeactivateAirport, useReactivateAirport, useDeactivateLessonType, useReactivateLessonType } from '@/lib/queries/lookups'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Plane, GraduationCap } from 'lucide-react'
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { AirportList } from '@/components/lookups/AirportList'
+import { AirportFormDialog } from '@/components/lookups/AirportFormDialog'
+import { LessonTypeList } from '@/components/lookups/LessonTypeList'
+import { LessonTypeFormDialog } from '@/components/lookups/LessonTypeFormDialog'
+import { toast } from 'sonner'
+import type { Database } from '@/lib/types/database.types'
+
+type Airport = Database['public']['Tables']['airports']['Row']
+type LessonType = Database['public']['Tables']['lesson_types']['Row']
 
 export default function AdminLookupsClient() {
   const [activeTab, setActiveTab] = useState<'airports' | 'lessons'>('airports')
   
   const { data: airports = [], isLoading: airportsLoading } = useAllAirports()
   const { data: lessonTypes = [], isLoading: lessonsLoading } = useAllLessonTypes()
+  const deactivateAirport = useDeactivateAirport()
+  const reactivateAirport = useReactivateAirport()
+  const deactivateLessonType = useDeactivateLessonType()
+  const reactivateLessonType = useReactivateLessonType()
+
+  // Airport dialog state
+  const [airportDialogOpen, setAirportDialogOpen] = useState(false)
+  const [editingAirport, setEditingAirport] = useState<Airport | null>(null)
+
+  // Lesson type dialog state
+  const [lessonTypeDialogOpen, setLessonTypeDialogOpen] = useState(false)
+  const [editingLessonType, setEditingLessonType] = useState<LessonType | null>(null)
+
+  // Airport handlers
+  const handleAddAirport = () => {
+    setEditingAirport(null)
+    setAirportDialogOpen(true)
+  }
+
+  const handleEditAirport = (airport: Airport) => {
+    setEditingAirport(airport)
+    setAirportDialogOpen(true)
+  }
+
+  const handleDeactivateAirport = async (airport: Airport) => {
+    try {
+      await deactivateAirport.mutateAsync(airport.id)
+      toast.success(`✅ ${airport.code} has been deactivated`)
+    } catch (error: any) {
+      console.error('Error deactivating airport:', error)
+      toast.error(error.message || 'Failed to deactivate airport')
+    }
+  }
+
+  const handleReactivateAirport = async (airport: Airport) => {
+    try {
+      await reactivateAirport.mutateAsync(airport.id)
+      toast.success(`✅ ${airport.code} has been reactivated`)
+    } catch (error: any) {
+      console.error('Error reactivating airport:', error)
+      toast.error(error.message || 'Failed to reactivate airport')
+    }
+  }
+
+  // Lesson type handlers
+  const handleAddLessonType = () => {
+    setEditingLessonType(null)
+    setLessonTypeDialogOpen(true)
+  }
+
+  const handleEditLessonType = (lessonType: LessonType) => {
+    setEditingLessonType(lessonType)
+    setLessonTypeDialogOpen(true)
+  }
+
+  const handleDeactivateLessonType = async (lessonType: LessonType) => {
+    try {
+      await deactivateLessonType.mutateAsync(lessonType.id)
+      toast.success(`✅ "${lessonType.name}" has been deactivated`)
+    } catch (error: any) {
+      console.error('Error deactivating lesson type:', error)
+      toast.error(error.message || 'Failed to deactivate lesson type')
+    }
+  }
+
+  const handleReactivateLessonType = async (lessonType: LessonType) => {
+    try {
+      await reactivateLessonType.mutateAsync(lessonType.id)
+      toast.success(`✅ "${lessonType.name}" has been reactivated`)
+    } catch (error: any) {
+      console.error('Error reactivating lesson type:', error)
+      toast.error(error.message || 'Failed to reactivate lesson type')
+    }
+  }
 
   const activeAirportsCount = airports.filter(a => a.is_active).length
   const activeLessonsCount = lessonTypes.filter(l => l.is_active).length
@@ -39,13 +122,13 @@ export default function AdminLookupsClient() {
                 </CardDescription>
               </div>
               {activeTab === 'airports' && (
-                <Button>
+                <Button onClick={handleAddAirport}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Airport
                 </Button>
               )}
               {activeTab === 'lessons' && (
-                <Button>
+                <Button onClick={handleAddLessonType}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Lesson Type
                 </Button>
@@ -72,61 +155,47 @@ export default function AdminLookupsClient() {
               </TabsList>
 
               <TabsContent value="airports" className="space-y-4">
-                {airportsLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Loading airports...
-                  </div>
-                ) : airports.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Plane className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground mb-4">No airports configured yet</p>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add First Airport
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="text-sm text-muted-foreground mb-2">
-                      Showing {airports.length} airports ({activeAirportsCount} active, {airports.length - activeAirportsCount} inactive)
-                    </div>
-                    {/* Airport list will go here */}
-                    <div className="text-muted-foreground text-sm">
-                      Airport management UI coming next...
-                    </div>
-                  </div>
-                )}
+                <AirportList
+                  onAdd={handleAddAirport}
+                  onEdit={handleEditAirport}
+                  onDeactivate={handleDeactivateAirport}
+                  onReactivate={handleReactivateAirport}
+                />
               </TabsContent>
 
               <TabsContent value="lessons" className="space-y-4">
-                {lessonsLoading ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Loading lesson types...
-                  </div>
-                ) : lessonTypes.length === 0 ? (
-                  <div className="text-center py-12">
-                    <GraduationCap className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground mb-4">No lesson types configured yet</p>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add First Lesson Type
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="text-sm text-muted-foreground mb-2">
-                      Showing {lessonTypes.length} lesson types ({activeLessonsCount} active, {lessonTypes.length - activeLessonsCount} inactive)
-                    </div>
-                    {/* Lesson types list will go here */}
-                    <div className="text-muted-foreground text-sm">
-                      Lesson type management UI coming next...
-                    </div>
-                  </div>
-                )}
+                <LessonTypeList
+                  onAdd={handleAddLessonType}
+                  onEdit={handleEditLessonType}
+                  onDeactivate={handleDeactivateLessonType}
+                  onReactivate={handleReactivateLessonType}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Airport Form Dialog */}
+        <AirportFormDialog
+          airport={editingAirport}
+          open={airportDialogOpen}
+          onOpenChange={setAirportDialogOpen}
+          onSuccess={() => {
+            setAirportDialogOpen(false)
+            setEditingAirport(null)
+          }}
+        />
+
+        {/* Lesson Type Form Dialog */}
+        <LessonTypeFormDialog
+          lessonType={editingLessonType}
+          open={lessonTypeDialogOpen}
+          onOpenChange={setLessonTypeDialogOpen}
+          onSuccess={() => {
+            setLessonTypeDialogOpen(false)
+            setEditingLessonType(null)
+          }}
+        />
 
         {/* System Status Footer */}
         <div className="flex items-center justify-between text-sm text-muted-foreground border-t pt-4">

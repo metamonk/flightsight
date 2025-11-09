@@ -39,7 +39,7 @@ export const aircraftSchema = z.object({
     .optional()
     .nullable(),
   
-  is_active: z.boolean().default(true),
+  is_active: z.boolean().optional().default(true),
   
   maintenance_notes: z
     .string()

@@ -33,7 +33,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type Aircraft = Database['public']['Tables']['aircraft']['Row']
 
