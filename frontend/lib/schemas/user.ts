@@ -15,13 +15,9 @@ export const userUpdateSchema = z.object({
     .email('Please enter a valid email address')
     .max(255, 'Email must be less than 255 characters'),
   
-  role: z.enum(['student', 'instructor', 'admin'], {
-    errorMap: () => ({ message: 'Please select a valid role' }),
-  }),
+  role: z.enum(['student', 'instructor', 'admin']),
   
-  training_level: z.enum(['student_pilot', 'private_pilot', 'instrument_rated', 'commercial_pilot'], {
-    errorMap: () => ({ message: 'Please select a valid training level' }),
-  }).optional().nullable(),
+  training_level: z.enum(['student_pilot', 'private_pilot', 'instrument_rated', 'commercial_pilot']).optional().nullable(),
   
   phone: z.string()
     .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 

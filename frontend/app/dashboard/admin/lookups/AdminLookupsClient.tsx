@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Plane, GraduationCap } from 'lucide-react'
-import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { AdminRealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { AirportList } from '@/components/lookups/AirportList'
 import { AirportFormDialog } from '@/components/lookups/AirportFormDialog'
 import { LessonTypeList } from '@/components/lookups/LessonTypeList'
@@ -102,7 +102,7 @@ export default function AdminLookupsClient() {
   const activeLessonsCount = lessonTypes.filter(l => l.is_active).length
 
   return (
-    <RealtimeProvider userId="admin-lookups">
+    <AdminRealtimeProvider>
       <div className="container mx-auto py-6 space-y-6">
         {/* Header */}
         <div>
@@ -208,7 +208,7 @@ export default function AdminLookupsClient() {
           </div>
         </div>
       </div>
-    </RealtimeProvider>
+    </AdminRealtimeProvider>
   )
 }
 

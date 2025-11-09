@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type Airport = Database['public']['Tables']['airports']['Row']
 type AirportInsert = Database['public']['Tables']['airports']['Insert']

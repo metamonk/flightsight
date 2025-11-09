@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type AvailabilityPattern = Database['public']['Tables']['availability']['Row']
 type AvailabilityInsert = Database['public']['Tables']['availability']['Insert']
@@ -116,7 +116,7 @@ export function useUpdateAvailability() {
       if (error) throw error
       return result
     },
-    onSuccess: (result) => {
+    onSuccess: (result: AvailabilityPattern) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['instructorAvailability', result.user_id] })
       queryClient.invalidateQueries({ queryKey: ['allInstructorsAvailability'] })

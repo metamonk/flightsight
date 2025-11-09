@@ -110,19 +110,19 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} modal>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[95vh] overflow-y-auto gap-0">
+        <DialogHeader className="pb-4">
           <DialogTitle>Book a Flight Lesson</DialogTitle>
           <DialogDescription>
             Schedule a new flight lesson with an instructor
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto max-h-[calc(95vh-12rem)] px-1">
           {/* Availability Info Alert */}
           {hasTimeSelected && (
             <Alert>
@@ -180,7 +180,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
               <SelectTrigger id="instructor">
                 <SelectValue placeholder={hasTimeSelected ? "Select an available instructor" : "Select date/time first"} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {instructorsLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : instructors.length > 0 ? (
@@ -209,7 +209,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
               <SelectTrigger id="aircraft">
                 <SelectValue placeholder="Select an aircraft" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {aircraftLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : aircraft && aircraft.length > 0 ? (
@@ -236,7 +236,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
               <SelectTrigger id="lesson_type">
                 <SelectValue placeholder="Select a lesson type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 {lessonTypesLoading ? (
                   <SelectItem value="loading" disabled>Loading...</SelectItem>
                 ) : lessonTypes && lessonTypes.length > 0 ? (
@@ -264,7 +264,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
               <SelectTrigger id="flight_type">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
                 <SelectItem value="local">Local (Pattern)</SelectItem>
                 <SelectItem value="short_xc">Short Cross-Country (50-100nm)</SelectItem>
                 <SelectItem value="long_xc">Long Cross-Country (100+ nm)</SelectItem>
@@ -284,7 +284,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 <SelectTrigger id="departure_airport">
                   <SelectValue placeholder="Select departure airport" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px]">
                   {airportsLoading ? (
                     <SelectItem value="loading" disabled>Loading...</SelectItem>
                   ) : airports && airports.length > 0 ? (
@@ -313,7 +313,7 @@ export function BookingFormDialog({ children }: { children: React.ReactNode}) {
                 <SelectTrigger id="destination_airport">
                   <SelectValue placeholder="Select destination airport" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px]">
                   {airportsLoading ? (
                     <SelectItem value="loading" disabled>Loading...</SelectItem>
                   ) : airports && airports.length > 0 ? (

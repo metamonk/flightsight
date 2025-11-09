@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type Aircraft = Database['public']['Tables']['aircraft']['Row']
 type AircraftInsert = Database['public']['Tables']['aircraft']['Insert']
@@ -129,7 +129,7 @@ export function useUpdateAircraft() {
       if (error) throw error
       return result
     },
-    onSuccess: (result) => {
+    onSuccess: (result: Aircraft) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['aircraft'] })
       queryClient.invalidateQueries({ queryKey: ['aircraft', result.id] })

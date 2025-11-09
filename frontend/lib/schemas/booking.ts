@@ -10,9 +10,7 @@ export const bookingSchema = z.object({
   scheduled_start: z.string().datetime('Please select a valid date and time'),
   scheduled_end: z.string().datetime('Please select a valid end time'),
   lesson_type: z.string().min(1, 'Please enter a lesson type'),
-  flight_type: z.enum(['local', 'short_xc', 'long_xc'], {
-    errorMap: () => ({ message: 'Please select a valid flight type' }),
-  }),
+  flight_type: z.enum(['local', 'short_xc', 'long_xc']),
   departure_airport: z.string().length(4, 'Airport code must be 4 characters (e.g., KAUS)').toUpperCase(),
   destination_airport: z.string().length(4, 'Airport code must be 4 characters').toUpperCase().optional().or(z.literal('')),
   lesson_notes: z.string().optional(),

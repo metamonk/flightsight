@@ -45,7 +45,7 @@ export function useAllUsers() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      return data as User[]
+      return data as unknown as User[]
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
@@ -65,7 +65,7 @@ export function useUsersByRole(role?: UserRole) {
         .order('full_name', { ascending: true })
 
       if (error) throw error
-      return data as User[]
+      return data as unknown as User[]
     },
     enabled: !!role,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -246,7 +246,7 @@ export function useUpdateUser() {
         throw new Error(result.error || 'Failed to update user')
       }
       
-      return result.data as User
+      return result.data as unknown as User
     },
     onSuccess: (result) => {
       // Invalidate relevant queries
@@ -272,7 +272,7 @@ export function usePromoteToInstructor() {
         throw new Error(result.error || 'Failed to promote user to instructor')
       }
       
-      return result.data as User
+      return result.data as unknown as User
     },
     onSuccess: () => {
       // Invalidate all user queries
@@ -297,7 +297,7 @@ export function useDemoteToStudent() {
         throw new Error(result.error || 'Failed to demote instructor to student')
       }
       
-      return result.data as User
+      return result.data as unknown as User
     },
     onSuccess: () => {
       // Invalidate all user queries
@@ -359,7 +359,7 @@ export function useDeactivateUser() {
         throw new Error(result.error || 'Failed to deactivate user')
       }
       
-      return result.data as User
+      return result.data as unknown as User
     },
     onSuccess: () => {
       // Invalidate all user queries
@@ -384,7 +384,7 @@ export function useReactivateUser() {
         throw new Error(result.error || 'Failed to reactivate user')
       }
       
-      return result.data as User
+      return result.data as unknown as User
     },
     onSuccess: () => {
       // Invalidate all user queries

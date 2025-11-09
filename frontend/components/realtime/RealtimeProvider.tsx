@@ -418,6 +418,20 @@ export function useAdminRealtimeSubscription() {
     [queryClient]
   )
 
+  const debouncedInvalidateAirports = useCallback(
+    debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['airports'] })
+    }, 500),
+    [queryClient]
+  )
+
+  const debouncedInvalidateLessonTypes = useCallback(
+    debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['lessonTypes'] })
+    }, 500),
+    [queryClient]
+  )
+
   // Reconnection logic with exponential backoff
   const reconnect = useCallback(() => {
     if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
@@ -504,6 +518,34 @@ export function useAdminRealtimeSubscription() {
         }
       )
 
+      // Listen for airport changes
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'airports',
+        },
+        (payload) => {
+          console.log('✈️ Airport update:', payload.eventType, (payload.new as any)?.code)
+          debouncedInvalidateAirports()
+        }
+      )
+
+      // Listen for lesson type changes
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'lesson_types',
+        },
+        (payload) => {
+          console.log('📚 Lesson type update:', payload.eventType, (payload.new as any)?.name)
+          debouncedInvalidateLessonTypes()
+        }
+      )
+
       .subscribe((status, error) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
           console.log('✅ Admin realtime subscriptions active')
@@ -537,7 +579,7 @@ export function useAdminRealtimeSubscription() {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [queryClient, supabase, debouncedInvalidateAdminBookings, debouncedInvalidateAdminConflicts, debouncedInvalidateAdminProposals, debouncedInvalidateAdminUsers, reconnect])
+  }, [queryClient, supabase, debouncedInvalidateAdminBookings, debouncedInvalidateAdminConflicts, debouncedInvalidateAdminProposals, debouncedInvalidateAdminUsers, debouncedInvalidateAirports, debouncedInvalidateLessonTypes, reconnect])
 
   return { connectionStatus }
 }

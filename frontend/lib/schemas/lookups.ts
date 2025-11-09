@@ -43,9 +43,7 @@ export const lessonTypeSchema = z.object({
     .max(500, { message: 'Description must be at most 500 characters' })
     .optional()
     .nullable(),
-  category: z.enum(lessonTypeCategories, {
-    errorMap: () => ({ message: 'Category must be primary, advanced, or specialized' })
-  }).optional().nullable(),
+  category: z.enum(lessonTypeCategories).optional().nullable(),
   is_active: z.boolean().default(true),
 })
 
