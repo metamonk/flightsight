@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CloudRain, AlertTriangle } from 'lucide-react'
 import { useMemo } from 'react'
+import Link from 'next/link'
 
 /**
  * Bookings List Component
@@ -77,60 +78,62 @@ export function BookingsList({ userId }: { userId: string }) {
         const hasWeatherIssue = !!weatherConflict
 
         return (
-          <Card
-            key={booking.id}
-            className={`hover:border-primary/50 transition-colors ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
-          >
-            <CardContent>
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground">
-                      {booking.lesson_type.replace('_', ' ').toUpperCase()}
-                    </h3>
+          <Link key={booking.id} href={`/dashboard/booking/${booking.id}`}>
+            <Card
+              className={`hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
+            >
+              <CardContent>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-foreground">
+                        {booking.lesson_type.replace('_', ' ').toUpperCase()}
+                      </h3>
+                      {hasWeatherIssue && (
+                        <Badge variant="destructive" className="gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Weather Alert
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {booking.aircraft?.registration || 'Aircraft TBD'}
+                    </p>
                     {hasWeatherIssue && (
-                      <Badge variant="destructive" className="gap-1">
-                        <AlertTriangle className="h-3 w-3" />
-                        Weather Alert
-                      </Badge>
+                      <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                        <CloudRain className="h-3 w-3" />
+                        {weatherConflict.conflict_reasons?.[0] || 'Unsafe weather conditions detected'}
+                      </p>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {booking.aircraft?.registration || 'Aircraft TBD'}
-                  </p>
-                  {hasWeatherIssue && (
-                    <p className="text-xs text-destructive mt-2 flex items-center gap-1">
-                      <CloudRain className="h-3 w-3" />
-                      {weatherConflict.conflict_reasons?.[0] || 'Unsafe weather conditions detected'}
-                    </p>
-                  )}
+                  <Badge 
+                    variant={
+                      hasWeatherIssue ? 'destructive' : 
+                      booking.status === 'confirmed' ? 'default' : 
+                      booking.status === 'pending' ? 'secondary' : 'outline'
+                    }
+                  >
+                    {hasWeatherIssue ? 'Weather Issue' : booking.status === 'pending' ? 'Pending' : booking.status}
+                  </Badge>
                 </div>
-                <Badge 
-                  variant={
-                    hasWeatherIssue ? 'destructive' : 
-                    booking.status === 'confirmed' ? 'default' : 'secondary'
-                  }
-                >
-                  {hasWeatherIssue ? 'Weather Issue' : booking.status}
-                </Badge>
-              </div>
 
-              <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <span>📅</span>
-                  <span>{format(new Date(booking.scheduled_start), 'MMM d, yyyy')}</span>
+                <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <span>📅</span>
+                    <span>{format(new Date(booking.scheduled_start), 'MMM d, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span>🕐</span>
+                    <span>{format(new Date(booking.scheduled_start), 'h:mm a')}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span>👨‍✈️</span>
+                    <span>{booking.instructor?.name || 'Instructor TBD'}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span>🕐</span>
-                  <span>{format(new Date(booking.scheduled_start), 'h:mm a')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span>👨‍✈️</span>
-                  <span>{booking.instructor?.name || 'Instructor TBD'}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         )
       })}
     </div>

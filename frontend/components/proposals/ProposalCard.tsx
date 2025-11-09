@@ -8,14 +8,14 @@ import { Button } from '@/components/ui/button'
 interface ProposalCardProps {
   proposal: {
     id: string
-    proposed_start?: string // For student view (separate start/end times)
-    proposed_end?: string // For student view
-    proposed_time?: string // For instructor view (single time field)
-    ai_score: number
-    ai_reasoning?: string
-    status: 'pending' | 'accepted' | 'rejected'
+    proposed_start: string
+    proposed_end: string
+    score: number
+    reasoning?: string
     student_response?: string
-    instructor_approved_at?: string
+    instructor_response?: string
+    student_responded_at?: string
+    instructor_responded_at?: string
   }
   rank: number // 0=best, 1=second, 2=third
   onAccept?: (proposalId: string, bookingId?: string) => void
@@ -40,9 +40,11 @@ export function ProposalCard({
   variant,
   bookingId,
 }: ProposalCardProps) {
-  const isAccepted = proposal.status === 'accepted'
-  const isRejected = proposal.status === 'rejected'
-  const isPending = proposal.status === 'pending'
+  // Determine status based on student response (for student view) or instructor response (for instructor view)
+  const response = variant === 'student' ? proposal.student_response : proposal.instructor_response
+  const isAccepted = response === 'accepted'
+  const isRejected = response === 'rejected'
+  const isPending = !response || response === 'pending'
 
   // Rank badge configuration using Badge variants
   const getRankConfig = () => {
@@ -76,19 +78,14 @@ export function ProposalCard({
 
   const rankConfig = getRankConfig()
 
-  // Format proposed time based on variant
+  // Format proposed time
   const getProposedTime = () => {
-    if (variant === 'student' && proposal.proposed_start) {
+    if (proposal.proposed_start) {
       return {
         date: format(new Date(proposal.proposed_start), 'MMM d, yyyy'),
         timeRange: `${format(new Date(proposal.proposed_start), 'h:mm a')}${
           proposal.proposed_end ? ` - ${format(new Date(proposal.proposed_end), 'h:mm a')}` : ''
         }`,
-      }
-    } else if (variant === 'instructor' && proposal.proposed_time) {
-      return {
-        date: format(new Date(proposal.proposed_time), 'EEE, MMM d'),
-        timeRange: format(new Date(proposal.proposed_time), 'h:mm a'),
       }
     }
     return { date: 'Unknown', timeRange: 'Unknown' }
@@ -130,7 +127,7 @@ export function ProposalCard({
                 <span>{rankConfig.label}</span>
               </Badge>
               <span className="text-xs text-muted-foreground">
-                Score: {Math.round((proposal.ai_score || 0) * 100)}%
+                Score: {Math.round((proposal.score || 0))}
               </span>
             </>
           ) : (
@@ -139,7 +136,7 @@ export function ProposalCard({
               <div>
                 <p className="font-medium text-foreground">{proposedTime.date} • {proposedTime.timeRange}</p>
                 <p className="text-xs text-muted-foreground">
-                  AI Score: {Math.round((proposal.ai_score || 0) * 100)}%
+                  AI Score: {Math.round((proposal.score || 0))}
                 </p>
               </div>
             </div>
@@ -172,13 +169,13 @@ export function ProposalCard({
         )}
 
         {/* AI Reasoning */}
-        {proposal.ai_reasoning && (
+        {proposal.reasoning && (
           <div className="mb-4">
             <p className={`text-sm text-muted-foreground ${variant === 'student' ? 'line-clamp-3' : 'italic'}`}>
               {variant === 'instructor' && '"'}
               {variant === 'instructor' 
-                ? proposal.ai_reasoning.substring(0, 120) + '...' 
-                : proposal.ai_reasoning}
+                ? proposal.reasoning.substring(0, 120) + '...' 
+                : proposal.reasoning}
               {variant === 'instructor' && '"'}
             </p>
           </div>

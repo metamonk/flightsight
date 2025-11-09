@@ -90,7 +90,7 @@ export function useProposals(conflictId?: string) {
             booking:bookings(*)
           )
         `)
-        .order('ai_score', { ascending: false })
+        .order('score', { ascending: false })
 
       if (conflictId) {
         query = query.eq('conflict_id', conflictId)
@@ -114,12 +114,11 @@ export function useAcceptProposal() {
 
   return useMutation({
     mutationFn: async (proposalId: string) => {
-      // @ts-ignore - Type will be properly defined when database types are generated
       const { data, error } = await supabase
         .from('reschedule_proposals')
         .update({ 
-          status: 'accepted',
-          student_response: 'accepted' 
+          student_response: 'accepted',
+          student_responded_at: new Date().toISOString()
         })
         .eq('id', proposalId)
         .select()
@@ -163,12 +162,11 @@ export function useRejectProposal() {
 
   return useMutation({
     mutationFn: async (proposalId: string) => {
-      // @ts-ignore - Type will be properly defined when database types are generated
       const { data, error } = await supabase
         .from('reschedule_proposals')
         .update({ 
-          status: 'rejected',
-          student_response: 'rejected'
+          student_response: 'rejected',
+          student_responded_at: new Date().toISOString()
         })
         .eq('id', proposalId)
         .select()
@@ -292,10 +290,14 @@ export function useApproveProposal() {
 
   return useMutation({
     mutationFn: async ({ proposalId, bookingId }: { proposalId: string; bookingId: string }) => {
-      // Update proposal status to accepted
+      // Update proposal with instructor acceptance
       const { error: proposalError } = await supabase
         .from('reschedule_proposals')
-        .update({ status: 'accepted', instructor_approved_at: new Date().toISOString() })
+        .update({ 
+          instructor_response: 'accepted',
+          instructor_responded_at: new Date().toISOString(),
+          accepted_at: new Date().toISOString()
+        })
         .eq('id', proposalId)
 
       if (proposalError) throw proposalError
@@ -303,7 +305,7 @@ export function useApproveProposal() {
       // Update booking with new time from proposal
       const { data: proposal } = await supabase
         .from('reschedule_proposals')
-        .select('proposed_time')
+        .select('proposed_start, proposed_end, proposed_instructor_id, proposed_aircraft_id')
         .eq('id', proposalId)
         .single()
 
@@ -311,8 +313,11 @@ export function useApproveProposal() {
         const { error: bookingError } = await supabase
           .from('bookings')
           .update({ 
-            scheduled_start: proposal.proposed_time,
-            status: 'confirmed'
+            scheduled_start: proposal.proposed_start,
+            scheduled_end: proposal.proposed_end,
+            instructor_id: proposal.proposed_instructor_id || undefined,
+            aircraft_id: proposal.proposed_aircraft_id || undefined,
+            status: 'scheduled'
           })
           .eq('id', bookingId)
 
@@ -354,8 +359,8 @@ export function useRejectProposalAsInstructor() {
       const { data, error } = await supabase
         .from('reschedule_proposals')
         .update({ 
-          status: 'rejected',
-          instructor_rejected_at: new Date().toISOString() 
+          instructor_response: 'rejected',
+          instructor_responded_at: new Date().toISOString()
         })
         .eq('id', proposalId)
         .select()
