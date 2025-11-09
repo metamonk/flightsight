@@ -303,14 +303,15 @@ export function useApproveProposal() {
 
       if (proposalError) throw proposalError
 
-      // Update booking with new time from proposal
+      // Get proposal details including conflict_id
       const { data: proposal } = await supabase
         .from('reschedule_proposals')
-        .select('proposed_start, proposed_end, proposed_instructor_id, proposed_aircraft_id')
+        .select('proposed_start, proposed_end, proposed_instructor_id, proposed_aircraft_id, conflict_id')
         .eq('id', proposalId)
         .single()
 
       if (proposal) {
+        // Update booking with new time from proposal
         const { error: bookingError } = await supabase
           .from('bookings')
           .update({ 
@@ -323,6 +324,18 @@ export function useApproveProposal() {
           .eq('id', bookingId)
 
         if (bookingError) throw bookingError
+
+        // Resolve the weather conflict
+        const { error: conflictError } = await supabase
+          .from('weather_conflicts')
+          .update({
+            status: 'resolved',
+            resolved_at: new Date().toISOString(),
+            resolution_method: 'rescheduled'
+          })
+          .eq('id', proposal.conflict_id)
+
+        if (conflictError) throw conflictError
       }
 
       return { proposalId, bookingId }
