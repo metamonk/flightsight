@@ -60,6 +60,11 @@ export default async function InstructorDashboard() {
             </div>
             <div className="flex items-center gap-4">
               <Button variant="outline" size="default" asChild>
+                <Link href="/dashboard/instructor/availability">
+                  ⏰ Manage Availability
+                </Link>
+              </Button>
+              <Button variant="outline" size="default" asChild>
                 <Link href="/dashboard/instructor/calendar">
                   📅 Calendar View
                 </Link>
