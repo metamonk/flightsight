@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { AdminDashboardClient } from './AdminDashboardClient'
@@ -65,15 +66,22 @@ export default async function AdminDashboard() {
             </div>
             <p className="text-sm text-muted-foreground">{user.email}</p>
           </div>
-          <form>
-            <Button
-              formAction={logout}
-              variant="destructive"
-              size="default"
-            >
-              Sign Out
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="default" asChild>
+              <Link href="/dashboard/admin/aircraft">
+                ✈️ Manage Aircraft
+              </Link>
             </Button>
-          </form>
+            <form>
+              <Button
+                formAction={logout}
+                variant="destructive"
+                size="default"
+              >
+                Sign Out
+              </Button>
+            </form>
+          </div>
         </div>
       </header>
 
