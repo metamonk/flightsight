@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { format } from 'date-fns'
 import { AlertTriangle, Cloud, Wind, Eye, Gauge, CloudRain, Thermometer, Droplets, X } from 'lucide-react'
-import Link from 'next/link'
 
 interface WeatherConflict {
   id: string
@@ -356,10 +355,17 @@ export function WeatherConflictModal({ conflict, open, onOpenChange }: WeatherCo
               )}
             </div>
             {status === 'proposals_ready' && (
-              <Button asChild>
-                <Link href={`/dashboard/student?conflict=${conflict.id}`}>
-                  View AI Proposals →
-                </Link>
+              <Button
+                onClick={() => {
+                  onOpenChange(false)
+                  // Scroll to proposals section after modal closes
+                  setTimeout(() => {
+                    const proposalsSection = document.querySelector('[data-proposals-section]')
+                    proposalsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }, 300)
+                }}
+              >
+                View AI Proposals →
               </Button>
             )}
           </div>

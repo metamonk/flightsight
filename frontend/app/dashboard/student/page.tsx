@@ -140,7 +140,7 @@ export default async function StudentDashboard() {
           </div>
 
           {/* AI Proposals Section */}
-          <div className="mt-6">
+          <div className="mt-6" data-proposals-section>
             <Card>
               <CardHeader className="bg-muted/50">
                 <CardTitle className="text-lg flex items-center gap-2">
