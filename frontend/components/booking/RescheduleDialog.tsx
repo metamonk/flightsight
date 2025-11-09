@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,12 +10,24 @@ import { Textarea } from '@/components/ui/textarea'
 import { requestReschedule } from '@/app/booking/actions'
 import { toast } from 'sonner'
 import { Calendar } from 'lucide-react'
+import { localToUTC, utcToLocal } from '@/lib/utils/date'
 
 interface RescheduleDialogProps {
   bookingId: string
-  currentStart: string
-  currentEnd: string
-  children: React.ReactNode
+  /** Current/original start time (for button trigger mode) */
+  currentStart?: string
+  /** Current/original end time (for button trigger mode) */
+  currentEnd?: string
+  /** Proposed start time from drag-and-drop (for controlled mode) */
+  proposedStart?: string
+  /** Proposed end time from drag-and-drop (for controlled mode) */
+  proposedEnd?: string
+  /** Controlled open state */
+  open?: boolean
+  /** Callback when dialog closes */
+  onClose?: () => void
+  /** Trigger element (for button trigger mode) */
+  children?: React.ReactNode
 }
 
 /**
@@ -22,18 +35,52 @@ interface RescheduleDialogProps {
  * 
  * Modal form for students or instructors to request a reschedule
  * with a new date/time and reason.
+ * 
+ * Supports two modes:
+ * 1. Button trigger mode: Pass currentStart/currentEnd and children
+ * 2. Controlled mode: Pass proposedStart/proposedEnd, open, and onClose (for drag-and-drop)
  */
 export function RescheduleDialog({ 
   bookingId, 
   currentStart, 
   currentEnd,
+  proposedStart,
+  proposedEnd,
+  open: controlledOpen,
+  onClose,
   children 
 }: RescheduleDialogProps) {
-  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  
+  // Determine if we're in controlled or uncontrolled mode
+  const isControlled = controlledOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? controlledOpen : internalOpen
+  const setOpen = (value: boolean) => {
+    if (isControlled) {
+      if (!value && onClose) onClose()
+    } else {
+      setInternalOpen(value)
+    }
+  }
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newStart, setNewStart] = useState(currentStart.slice(0, 16))
-  const [newEnd, setNewEnd] = useState(currentEnd.slice(0, 16))
+  const [newStart, setNewStart] = useState('')
+  const [newEnd, setNewEnd] = useState('')
   const [reason, setReason] = useState('')
+
+  // Initialize form values when dialog opens or props change
+  useEffect(() => {
+    if (open) {
+      // Use proposed times from drag-and-drop if available, otherwise use current times
+      const startTime = proposedStart || currentStart || new Date().toISOString()
+      const endTime = proposedEnd || currentEnd || new Date().toISOString()
+      
+      setNewStart(utcToLocal(startTime))
+      setNewEnd(utcToLocal(endTime))
+      setReason('') // Reset reason on open
+    }
+  }, [open, proposedStart, proposedEnd, currentStart, currentEnd])
 
   // Calculate min and max dates for datetime pickers
   const minDateTime = new Date()
@@ -77,22 +124,31 @@ export function RescheduleDialog({
 
       const result = await requestReschedule(
         bookingId,
-        new Date(newStart).toISOString(),
-        new Date(newEnd).toISOString(),
+        localToUTC(newStart),
+        localToUTC(newEnd),
         reason
       )
       
       if (result.error) {
         toast.error(result.error)
+        // If backend fails, the revalidatePath in the action won't run,
+        // so we need to manually refresh to revert optimistic UI changes
+        router.refresh()
       } else {
-        toast.success('✅ Reschedule request submitted!')
+        toast.success('✅ Reschedule request submitted!', {
+          description: 'Waiting for approval from the other party'
+        })
         setOpen(false)
         // Reset form
         setReason('')
+        // The revalidatePath in the server action will trigger a refresh
+        router.refresh()
       }
     } catch (error) {
       toast.error('Failed to request reschedule')
       console.error(error)
+      // Reload on error to revert optimistic changes
+      router.refresh()
     } finally {
       setIsSubmitting(false)
     }
@@ -100,9 +156,12 @@ export function RescheduleDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      {/* Only show trigger in uncontrolled mode */}
+      {!isControlled && children && (
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -110,7 +169,13 @@ export function RescheduleDialog({
             Request Reschedule
           </DialogTitle>
           <DialogDescription>
-            Propose a new date and time for this lesson. The other party will need to approve.
+            {proposedStart && proposedEnd ? (
+              <>
+                <span className="font-medium text-primary">✅ Drag complete!</span> Review the new time below and provide a reason for the change. The other party will need to approve.
+              </>
+            ) : (
+              'Propose a new date and time for this lesson. The other party will need to approve.'
+            )}
           </DialogDescription>
         </DialogHeader>
         
