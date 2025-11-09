@@ -2,9 +2,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
-import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { InstructorRealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { InstructorBookingsList } from '@/components/booking/InstructorBookingsList'
 import { InstructorProposalsList } from '@/components/proposals/InstructorProposalsList'
+import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -44,7 +45,7 @@ export default async function InstructorDashboard() {
   }
 
   return (
-    <RealtimeProvider userId={user.id}>
+    <InstructorRealtimeProvider instructorId={user.id}>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -115,8 +116,24 @@ export default async function InstructorDashboard() {
               </Card>
             </div>
 
-            {/* Quick Stats (placeholder for future) */}
-            <div>
+            {/* Weather Alerts & Quick Stats */}
+            <div className="space-y-6">
+              {/* Weather Alerts */}
+              <Card>
+                <CardHeader className="bg-muted/50">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    🌦️ Weather Alerts
+                  </CardTitle>
+                  <CardDescription>
+                    Affected lessons in your schedule
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <WeatherAlerts userId={user.id} />
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm uppercase tracking-wide">
@@ -162,7 +179,7 @@ export default async function InstructorDashboard() {
           </div>
         </main>
       </div>
-    </RealtimeProvider>
+    </InstructorRealtimeProvider>
   )
 }
 

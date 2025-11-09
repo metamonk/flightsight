@@ -1,19 +1,35 @@
 'use client'
 
-import { useInstructorBookings } from '@/lib/queries/bookings'
+import { useInstructorBookings, useWeatherConflicts } from '@/lib/queries/bookings'
 import { format } from 'date-fns'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AlertTriangle, CloudRain } from 'lucide-react'
+import { useMemo } from 'react'
 
 /**
  * Instructor Bookings List Component
  * 
  * Displays all upcoming flight bookings where the user is the instructor.
- * Shows student information and allows quick filtering/sorting.
+ * Shows student information and weather status for each booking.
  */
 export function InstructorBookingsList({ instructorId }: { instructorId: string }) {
   const { data: bookings, isLoading, error } = useInstructorBookings(instructorId)
+  const { data: conflicts } = useWeatherConflicts(instructorId)
+
+  // Create a map of booking IDs to their weather conflicts
+  const weatherConflictMap = useMemo(() => {
+    const map = new Map()
+    if (conflicts && Array.isArray(conflicts)) {
+      conflicts.forEach((conflict: any) => {
+        if (conflict.booking_id && conflict.status !== 'resolved') {
+          map.set(conflict.booking_id, conflict)
+        }
+      })
+    }
+    return map
+  }, [conflicts])
 
   if (isLoading) {
     return (
@@ -56,78 +72,98 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
 
   return (
     <div className="space-y-4">
-      {bookings.map((booking: any) => (
-        <Card
-          key={booking.id}
-          className="hover:border-primary/50 hover:shadow-sm transition-all"
-        >
-          <CardContent>
-            {/* Header with student name and status */}
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                  👤 {booking.student?.name || 'Student Name'}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {booking.student?.email || 'student@email.com'}
-                </p>
-              </div>
-              <Badge 
-                variant={
-                  booking.status === 'confirmed' 
-                    ? 'default' 
-                    : booking.status === 'weather_hold' || booking.status === 'rescheduling'
-                    ? 'secondary'
-                    : 'outline'
-                }
-              >
-                {booking.status.replace('_', ' ')}
-              </Badge>
-            </div>
+      {bookings.map((booking: any) => {
+        const weatherConflict = weatherConflictMap.get(booking.id)
+        const hasWeatherIssue = !!weatherConflict
 
-            {/* Lesson details */}
-            <Card className="bg-muted/50 mb-3">
-              <CardContent>
-                <p className="font-medium text-foreground mb-1">
-                  {booking.lesson_type.replace('_', ' ').toUpperCase()}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Aircraft: {booking.aircraft?.registration || 'TBD'} ({booking.aircraft?.make} {booking.aircraft?.model})
-                </p>
-              </CardContent>
-            </Card>
+        return (
+          <Card
+            key={booking.id}
+            className={`hover:border-primary/50 hover:shadow-sm transition-all ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
+          >
+            <CardContent>
+              {/* Header with student name and status */}
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                      👤 {booking.student?.name || 'Student Name'}
+                    </h3>
+                    {hasWeatherIssue && (
+                      <Badge variant="destructive" className="gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Weather
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {booking.student?.email || 'student@email.com'}
+                  </p>
+                  {hasWeatherIssue && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <CloudRain className="h-3 w-3" />
+                      {weatherConflict.conflict_reasons?.[0] || 'Weather conflict detected'}
+                    </p>
+                  )}
+                </div>
+                <Badge 
+                  variant={
+                    hasWeatherIssue ? 'destructive' :
+                    booking.status === 'confirmed' 
+                      ? 'default' 
+                      : booking.status === 'weather_hold' || booking.status === 'rescheduling'
+                      ? 'secondary'
+                      : 'outline'
+                  }
+                >
+                  {hasWeatherIssue ? 'Weather Issue' : booking.status.replace('_', ' ')}
+                </Badge>
+              </div>
 
-            {/* Schedule info */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <span>📅</span>
-                <span className="font-medium">
-                  {format(new Date(booking.scheduled_start), 'EEE, MMM d, yyyy')}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span>🕐</span>
-                <span className="font-medium">
-                  {format(new Date(booking.scheduled_start), 'h:mm a')}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span>⏱️</span>
-                <span>{booking.duration_minutes || 60} min</span>
-              </div>
-            </div>
+              {/* Lesson details */}
+              <Card className="bg-muted/50 mb-3">
+                <CardContent>
+                  <p className="font-medium text-foreground mb-1">
+                    {booking.lesson_type.replace('_', ' ').toUpperCase()}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Aircraft: {booking.aircraft?.registration || 'TBD'} ({booking.aircraft?.make} {booking.aircraft?.model})
+                  </p>
+                </CardContent>
+              </Card>
 
-            {/* Action buttons (for future) */}
-            {booking.status === 'weather_hold' && (
-              <div className="mt-3 pt-3 border-t border-border">
-                <p className="text-sm text-destructive/80 flex items-center gap-1">
-                  ⚠️ Weather hold - Reschedule proposals available
-                </p>
+              {/* Schedule info */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span className="font-medium">
+                    {format(new Date(booking.scheduled_start), 'EEE, MMM d, yyyy')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span>🕐</span>
+                  <span className="font-medium">
+                    {format(new Date(booking.scheduled_start), 'h:mm a')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span>⏱️</span>
+                  <span>{booking.duration_minutes || 60} min</span>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+
+              {/* Action buttons (for future) */}
+              {booking.status === 'weather_hold' && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <p className="text-sm text-destructive/80 flex items-center gap-1">
+                    ⚠️ Weather hold - Reschedule proposals available
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }
