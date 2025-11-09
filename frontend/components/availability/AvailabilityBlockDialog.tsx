@@ -32,7 +32,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type AvailabilityPattern = Database['public']['Tables']['availability']['Row']
 
@@ -123,9 +123,19 @@ export function AvailabilityBlockDialog({
       }
 
       onClose()
-    } catch (error) {
-      console.error('Error saving availability:', error)
-      toast.error('Failed to save availability pattern')
+    } catch (error: any) {
+      // Enhanced error logging to see actual Supabase error details
+      console.error('Error saving availability:', {
+        error,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+      })
+      
+      // Show detailed error message to user
+      const errorMessage = error?.message || error?.details || 'Failed to save availability pattern'
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

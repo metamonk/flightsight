@@ -14,7 +14,7 @@ import { Plus, Trash2, Edit } from 'lucide-react'
 import { AvailabilityBlockDialog } from './AvailabilityBlockDialog'
 import { toast } from 'sonner'
 import { DAY_LABELS, formatTimeDisplay, formatDateDisplay } from '@/lib/schemas/availability'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/lib/types/database.types'
 
 type AvailabilityPattern = Database['public']['Tables']['availability']['Row']
 
@@ -25,6 +25,19 @@ export function AvailabilityManagement() {
   
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingPattern, setEditingPattern] = useState<AvailabilityPattern | null>(null)
+
+  // Guard: Don't render if user is not loaded
+  if (!user?.id) {
+    return (
+      <Card>
+        <CardContent>
+          <div className="text-center text-muted-foreground py-6">
+            Loading user data...
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const handleAdd = () => {
     setEditingPattern(null)
@@ -47,9 +60,14 @@ export function AvailabilityManagement() {
         userId: pattern.user_id 
       })
       toast.success('Availability pattern deleted')
-    } catch (error) {
-      console.error('Error deleting availability:', error)
-      toast.error('Failed to delete availability pattern')
+    } catch (error: any) {
+      console.error('Error deleting availability:', {
+        error,
+        message: error?.message,
+        details: error?.details,
+      })
+      const errorMessage = error?.message || 'Failed to delete availability pattern'
+      toast.error(errorMessage)
     }
   }
 
@@ -171,7 +189,7 @@ export function AvailabilityManagement() {
         open={dialogOpen}
         onClose={handleDialogClose}
         editingPattern={editingPattern}
-        userId={user?.id || ''}
+        userId={user.id}
       />
     </>
   )
