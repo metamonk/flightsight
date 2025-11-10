@@ -1019,31 +1019,53 @@ export const GanttFeatureRow: FC<GanttFeatureRowProps> = ({
   children,
   className,
 }) => {
+  // Filter out features with invalid dates first
+  const validFeatures = features.filter(feature => {
+    const startValid = feature.startAt instanceof Date && !isNaN(feature.startAt.getTime());
+    const endValid = feature.endAt instanceof Date && !isNaN(feature.endAt.getTime());
+    
+    if (!startValid || !endValid) {
+      console.warn(`Invalid dates in feature ${feature.id}:`, feature.startAt, feature.endAt);
+      return false;
+    }
+    return true;
+  });
+
   // Sort features by start date to handle potential overlaps
-  const sortedFeatures = [...features].sort(
+  const sortedFeatures = [...validFeatures].sort(
     (a, b) => a.startAt.getTime() - b.startAt.getTime()
   );
 
-  // Calculate sub-row positions for overlapping features using a proper algorithm
+  // Calculate sub-row positions for overlapping features using proper interval scheduling
   const featureWithPositions = [];
-  const subRowEndTimes: Date[] = []; // Track when each sub-row becomes free
+  const subRowEndTimes: number[] = []; // Track when each sub-row becomes free (in milliseconds)
 
   for (const feature of sortedFeatures) {
+    const featureStartTime = feature.startAt.getTime();
+    const featureEndTime = feature.endAt.getTime();
+    
+    // Skip features with invalid time range
+    if (featureEndTime <= featureStartTime) {
+      console.warn(`Feature ${feature.id} has end time before or equal to start time`);
+      continue;
+    }
+    
     let subRow = 0;
 
     // Find the first sub-row that's free (doesn't overlap)
+    // A sub-row is free if its end time <= feature's start time
     while (
       subRow < subRowEndTimes.length &&
-      subRowEndTimes[subRow] > feature.startAt
+      subRowEndTimes[subRow] > featureStartTime
     ) {
       subRow++;
     }
 
     // Update the end time for this sub-row
     if (subRow === subRowEndTimes.length) {
-      subRowEndTimes.push(feature.endAt);
+      subRowEndTimes.push(featureEndTime);
     } else {
-      subRowEndTimes[subRow] = feature.endAt;
+      subRowEndTimes[subRow] = featureEndTime;
     }
 
     featureWithPositions.push({ ...feature, subRow });
