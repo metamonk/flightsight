@@ -14,6 +14,7 @@ import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop'
 import type { CalendarEvent } from '@schedule-x/calendar'
 import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
+import '@/lib/schedule-x/calendar-containment.css'
 
 import { 
   defaultCalendarConfig, 
@@ -158,7 +159,10 @@ export function ScheduleXCalendarWrapper({
       className={`schedule-x-wrapper ${className}`}
       style={{ 
         height: typeof height === 'number' ? `${height}px` : height,
-        maxWidth: '100%'
+        maxWidth: '100%',
+        position: 'relative',
+        overflow: 'hidden',
+        isolation: 'isolate' // Create stacking context to contain absolute elements
       }}
     >
       <ScheduleXCalendar 

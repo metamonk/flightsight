@@ -1,0 +1,113 @@
+/**
+ * Schedule-X Calendar Containment Fix
+ * 
+ * Ensures calendar events and UI elements stay within
+ * their container and don't overflow into adjacent sections.
+ */
+
+/* Container isolation */
+.schedule-x-wrapper {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  contain: layout style paint !important;
+}
+
+/* Ensure calendar itself is contained */
+.sx-react-calendar-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  contain: layout style !important;
+}
+
+/* Fix absolutely positioned elements within calendar */
+.sx-react-calendar-wrapper .sx-week-grid,
+.sx-react-calendar-wrapper .sx-day-grid,
+.sx-react-calendar-wrapper .sx-month-grid {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Ensure events stay within calendar bounds */
+.sx-react-calendar-wrapper .sx-event,
+.sx-react-calendar-wrapper .sx-background-event {
+  max-width: 100% !important;
+  contain: layout style !important;
+}
+
+/* Fix event positioning to respect boundaries */
+.sx-react-calendar-wrapper .sx-events-wrapper {
+  position: relative !important;
+  overflow: hidden !important;
+  contain: layout !important;
+}
+
+/* Prevent popovers from causing overflow */
+.sx-react-calendar-wrapper .sx-event-popover {
+  position: fixed !important; /* Use fixed instead of absolute to prevent container overflow */
+  z-index: 9999 !important;
+}
+
+/* Fix drag handles to not escape container */
+.sx-react-calendar-wrapper .sx-event.sx-dragging {
+  position: absolute !important;
+  z-index: 100 !important;
+  pointer-events: all !important;
+}
+
+/* Ensure drop zones don't overflow */
+.sx-react-calendar-wrapper .sx-drop-zone {
+  position: absolute !important;
+  contain: layout !important;
+}
+
+/* Fix current time indicator */
+.sx-react-calendar-wrapper .sx-current-time-indicator {
+  position: absolute !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Contain month grid days */
+.sx-react-calendar-wrapper .sx-month-grid-day {
+  position: relative !important;
+  overflow: hidden !important;
+  contain: layout style !important;
+}
+
+/* Fix week/day view columns */
+.sx-react-calendar-wrapper .sx-week-grid-column,
+.sx-react-calendar-wrapper .sx-day-grid-column {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Ensure time axis doesn't overflow */
+.sx-react-calendar-wrapper .sx-time-axis {
+  position: sticky !important;
+  left: 0 !important;
+  overflow: hidden !important;
+  z-index: 10 !important;
+}
+
+/* Fix header to not overflow */
+.sx-react-calendar-wrapper .sx-calendar-header {
+  position: relative !important;
+  z-index: 20 !important;
+  contain: layout style !important;
+}
+
+/* Prevent any child from breaking containment */
+.schedule-x-wrapper * {
+  box-sizing: border-box !important;
+}
+
+/* Fix for cards inside Calendar view to not overlay calendar */
+.schedule-x-wrapper + * {
+  position: relative !important;
+  z-index: 0 !important;
+}
+

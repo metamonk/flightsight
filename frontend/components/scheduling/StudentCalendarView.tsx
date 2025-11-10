@@ -247,7 +247,7 @@ export function StudentCalendarView({
   
   return (
     <>
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -282,7 +282,7 @@ export function StudentCalendarView({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-hidden">
           {enableRescheduling && (
             <div className="mb-4 p-3 bg-accent/50 border border-border rounded-lg text-sm">
               💡 <strong>Tip:</strong> Drag and drop bookings to reschedule them. 
@@ -290,22 +290,24 @@ export function StudentCalendarView({
             </div>
           )}
           
-          <ScheduleXCalendarWrapper
-            events={calendarEvents}
-            backgroundEvents={backgroundEvents}
-            selectedDate={initialDate}
-            defaultView={initialView}
-            callbacks={{
-              onEventClick: handleEventClick,
-              onEventUpdate: handleEventUpdate,
-              onClickDateTime: handleClickDateTime,
-            }}
-            enableDragDrop={enableRescheduling}
-            enableResize={false}
-            minHoursAdvance={1} // Require 1 hour advance notice
-            height={height}
-            className="rounded-lg"
-          />
+          <div className="relative overflow-hidden rounded-lg">
+            <ScheduleXCalendarWrapper
+              events={calendarEvents}
+              backgroundEvents={backgroundEvents}
+              selectedDate={initialDate}
+              defaultView={initialView}
+              callbacks={{
+                onEventClick: handleEventClick,
+                onEventUpdate: handleEventUpdate,
+                onClickDateTime: handleClickDateTime,
+              }}
+              enableDragDrop={enableRescheduling}
+              enableResize={false}
+              minHoursAdvance={1} // Require 1 hour advance notice
+              height={height}
+              className="rounded-lg"
+            />
+          </div>
         </CardContent>
       </Card>
       
