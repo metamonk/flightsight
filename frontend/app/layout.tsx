@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/lib/queries/provider";
 import { Toaster } from "@/components/ui/sonner";
 import { PerformanceMonitor } from "@/components/shared/PerformanceMonitor";
+import { ThemeProvider } from "@/components/shared/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +31,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          <PerformanceMonitor />
-          <Toaster position="top-right" />
-          {children}
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          <QueryProvider>
+            <PerformanceMonitor />
+            <Toaster position="top-right" />
+            {children}
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
