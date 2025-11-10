@@ -14,7 +14,6 @@ import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop'
 import type { CalendarEvent } from '@schedule-x/calendar'
 import 'temporal-polyfill/global'
 import '@schedule-x/theme-default/dist/index.css'
-import '@/lib/schedule-x/calendar-containment.css'
 
 import { 
   defaultCalendarConfig, 
