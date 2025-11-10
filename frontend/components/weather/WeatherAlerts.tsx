@@ -1,7 +1,7 @@
 'use client'
 
 import { useWeatherConflicts, useAcceptProposal, useRejectProposal } from '@/lib/queries/bookings'
-import { format } from 'date-fns'
+import { formatLocalTime } from '@/lib/utils/date'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -127,7 +127,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {conflict.booking.lesson_type} • {format(new Date(conflict.booking.scheduled_start), 'EEE, MMM d, h:mm a')}
+                        {conflict.booking.lesson_type} • {formatLocalTime(conflict.booking.scheduled_start, 'EEE, MMM d, h:mm a')}
                       </p>
                     </div>
                   </div>
@@ -262,7 +262,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                     <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4 animate-pulse" />
                       <span>AI is generating reschedule proposals...</span>
-                    </div>
+                </div>
                   )}
 
                   {conflict.status === 'detected' && (

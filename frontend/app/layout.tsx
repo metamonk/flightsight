@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/queries/provider";
 import { Toaster } from "@/components/ui/sonner";
+import { PerformanceMonitor } from "@/components/shared/PerformanceMonitor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
+          <PerformanceMonitor />
           <Toaster position="top-right" />
           {children}
         </QueryProvider>

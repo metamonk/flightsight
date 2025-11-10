@@ -1,6 +1,6 @@
 'use client'
 
-import { format } from 'date-fns'
+import { formatLocalTime } from '@/lib/utils/date'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -82,9 +82,9 @@ export function ProposalCard({
   const getProposedTime = () => {
     if (proposal.proposed_start) {
       return {
-        date: format(new Date(proposal.proposed_start), 'MMM d, yyyy'),
-        timeRange: `${format(new Date(proposal.proposed_start), 'h:mm a')}${
-          proposal.proposed_end ? ` - ${format(new Date(proposal.proposed_end), 'h:mm a')}` : ''
+        date: formatLocalTime(proposal.proposed_start, 'MMM d, yyyy'),
+        timeRange: `${formatLocalTime(proposal.proposed_start, 'h:mm a')}${
+          proposal.proposed_end ? ` - ${formatLocalTime(proposal.proposed_end, 'h:mm a')}` : ''
         }`,
       }
     }

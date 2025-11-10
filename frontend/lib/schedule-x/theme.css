@@ -300,15 +300,40 @@
   color: #78350f; /* amber-900 */
 }
 
-/* Weather conflicts */
+/* Weather conflicts - render as semi-transparent background overlays */
 .sx-react-calendar-wrapper .sx-event.sx-event-weather-conflict {
-  background-color: #ef4444; /* red-500 */
-  color: white;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #ef4444 0,
+    #ef4444 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  background-color: rgba(239, 68, 68, 0.1); /* red-500 with opacity */
+  color: #7f1d1d; /* red-900 */
+  border: 1px dashed #ef4444;
+  opacity: 0.8;
+  z-index: 0;
+  font-weight: 600;
+  pointer-events: auto;
+}
+
+.sx-react-calendar-wrapper .sx-event.sx-event-weather-conflict:hover {
+  opacity: 1;
+  z-index: 15;
 }
 
 .dark .sx-react-calendar-wrapper .sx-event.sx-event-weather-conflict {
-  background-color: #f87171; /* red-400 */
-  color: #7f1d1d; /* red-900 */
+  background-image: repeating-linear-gradient(
+    45deg,
+    #f87171 0,
+    #f87171 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  background-color: rgba(248, 113, 113, 0.15); /* red-400 with opacity */
+  color: #fee2e2; /* red-100 */
+  border: 1px dashed #f87171;
 }
 
 /* Cancelled bookings */

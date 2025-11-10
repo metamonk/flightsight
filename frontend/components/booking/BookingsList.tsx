@@ -1,14 +1,15 @@
 'use client'
 
-import { useBookings, useWeatherConflicts } from '@/lib/queries/bookings'
-import { format } from 'date-fns'
+import { useBookings, useWeatherConflicts, useAcceptProposal, useRejectProposal } from '@/lib/queries/bookings'
+import { formatLocalTime } from '@/lib/utils/date'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CloudRain, AlertTriangle } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { ProposalAccordion } from '@/components/proposals'
 
 /**
  * Bookings List Component
@@ -19,8 +20,11 @@ import Link from 'next/link'
 export function BookingsList({ userId }: { userId: string }) {
   const { data: bookings, isLoading, error } = useBookings(userId)
   const { data: conflicts } = useWeatherConflicts(userId)
+  const { mutate: acceptProposal, isPending: isAccepting } = useAcceptProposal()
+  const { mutate: rejectProposal, isPending: isRejecting } = useRejectProposal()
+  const [expandedConflict, setExpandedConflict] = useState<string | null>(null)
 
-  // Create a map of booking IDs to their weather conflicts
+  // Create a map of booking IDs to their weather conflicts with proposals
   const weatherConflictMap = useMemo(() => {
     const map = new Map()
     if (conflicts && Array.isArray(conflicts)) {
@@ -32,6 +36,19 @@ export function BookingsList({ userId }: { userId: string }) {
     }
     return map
   }, [conflicts])
+
+  // Handlers for proposal actions
+  const handleAcceptProposal = (proposalId: string) => {
+    if (confirm('Accept this reschedule proposal? Your booking will be updated.')) {
+      acceptProposal(proposalId)
+    }
+  }
+
+  const handleRejectProposal = (proposalId: string) => {
+    if (confirm('Decline this proposal? You can still accept other options.')) {
+      rejectProposal(proposalId)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -76,64 +93,82 @@ export function BookingsList({ userId }: { userId: string }) {
       {bookings.map((booking: any) => {
         const weatherConflict = weatherConflictMap.get(booking.id)
         const hasWeatherIssue = !!weatherConflict
+        const proposals = weatherConflict?.reschedule_proposals || []
 
         return (
-          <Link key={booking.id} href={`/dashboard/booking/${booking.id}`}>
-            <Card
-              className={`hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
-            >
-              <CardContent>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-foreground">
-                        {booking.lesson_type.replace('_', ' ').toUpperCase()}
-                      </h3>
+          <div key={booking.id} className="space-y-3">
+            {/* Main Booking Card */}
+            <Link href={`/dashboard/booking/${booking.id}`}>
+              <Card
+                className={`hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
+              >
+                <CardContent>
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground">
+                          {booking.lesson_type.replace('_', ' ').toUpperCase()}
+                        </h3>
+                        {hasWeatherIssue && (
+                          <Badge variant="destructive" className="gap-1">
+                            <AlertTriangle className="h-3 w-3" />
+                            Weather Alert
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {booking.aircraft?.registration || 'Aircraft TBD'}
+                      </p>
                       {hasWeatherIssue && (
-                        <Badge variant="destructive" className="gap-1">
-                          <AlertTriangle className="h-3 w-3" />
-                          Weather Alert
-                        </Badge>
+                        <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                          <CloudRain className="h-3 w-3" />
+                          {weatherConflict.conflict_reasons?.[0] || 'Unsafe weather conditions detected'}
+                        </p>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {booking.aircraft?.registration || 'Aircraft TBD'}
-                    </p>
-                    {hasWeatherIssue && (
-                      <p className="text-xs text-destructive mt-2 flex items-center gap-1">
-                        <CloudRain className="h-3 w-3" />
-                        {weatherConflict.conflict_reasons?.[0] || 'Unsafe weather conditions detected'}
-                      </p>
-                    )}
+                    <Badge 
+                      variant={
+                        hasWeatherIssue ? 'destructive' : 
+                        booking.status === 'confirmed' ? 'default' : 
+                        booking.status === 'pending' ? 'secondary' : 'outline'
+                      }
+                    >
+                      {hasWeatherIssue ? 'Weather Issue' : booking.status === 'pending' ? 'Pending' : booking.status}
+                    </Badge>
                   </div>
-                  <Badge 
-                    variant={
-                      hasWeatherIssue ? 'destructive' : 
-                      booking.status === 'confirmed' ? 'default' : 
-                      booking.status === 'pending' ? 'secondary' : 'outline'
-                    }
-                  >
-                    {hasWeatherIssue ? 'Weather Issue' : booking.status === 'pending' ? 'Pending' : booking.status}
-                  </Badge>
-                </div>
 
-                <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <span>📅</span>
-                    <span>{format(new Date(booking.scheduled_start), 'MMM d, yyyy')}</span>
+                  <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <span>📅</span>
+                      <span>{formatLocalTime(booking.scheduled_start, 'MMM d, yyyy')}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>🕐</span>
+                      <span>{formatLocalTime(booking.scheduled_start, 'h:mm a')}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>👨‍✈️</span>
+                      <span>{booking.instructor?.name || 'Instructor TBD'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span>🕐</span>
-                    <span>{format(new Date(booking.scheduled_start), 'h:mm a')}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>👨‍✈️</span>
-                    <span>{booking.instructor?.name || 'Instructor TBD'}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Inline ProposalAccordion for weather conflicts */}
+            {hasWeatherIssue && (
+              <ProposalAccordion
+                conflict={weatherConflict}
+                booking={booking}
+                proposals={proposals}
+                onAccept={handleAcceptProposal}
+                onReject={handleRejectProposal}
+                isLoading={isAccepting || isRejecting}
+                variant="student"
+                defaultOpen={expandedConflict === weatherConflict.id}
+              />
+            )}
+          </div>
         )
       })}
     </div>

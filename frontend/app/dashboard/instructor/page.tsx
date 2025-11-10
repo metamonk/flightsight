@@ -5,6 +5,7 @@ import { logout } from '@/app/auth/actions'
 import { InstructorRealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { InstructorBookingsList } from '@/components/booking/InstructorBookingsList'
 import { InstructorProposalsList } from '@/components/proposals/InstructorProposalsList'
+import { InstructorGanttView } from '@/components/scheduling/InstructorGanttView'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
@@ -164,6 +165,15 @@ export default async function InstructorDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          {/* Availability Timeline Section */}
+          <div className="mt-6">
+            <InstructorGanttView 
+              instructorId={user.id} 
+              editable={true}
+              height="500px"
+            />
           </div>
 
           {/* Reschedule Proposals Section */}

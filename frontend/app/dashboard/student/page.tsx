@@ -6,6 +6,7 @@ import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { StudentDashboardClient } from './StudentDashboardClient'
 import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
+import { MonthlyOverview, InstructorAvatarGroup } from '@/components/dashboard'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -111,7 +112,7 @@ export default async function StudentDashboard() {
           {/* Dashboard Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Upcoming Flights - with view toggle */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader className="bg-muted/50">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -122,10 +123,20 @@ export default async function StudentDashboard() {
                   <StudentDashboardClient userId={user.id} />
                 </CardContent>
               </Card>
+              
+              {/* Monthly Overview Widget */}
+              <MonthlyOverview
+                userId={user.id}
+                userRole="student"
+              />
             </div>
 
-            {/* Weather Alerts with Inline Proposals */}
-            <div>
+            {/* Right Sidebar */}
+            <div className="space-y-6">
+              {/* Available Instructors */}
+              <InstructorAvatarGroup />
+              
+              {/* Weather Alerts with Inline Proposals */}
               <Card>
                 <CardHeader className="bg-muted/50">
                   <CardTitle className="text-lg flex items-center gap-2">

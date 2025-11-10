@@ -1,13 +1,14 @@
 'use client'
 
-import { useInstructorBookings, useWeatherConflicts } from '@/lib/queries/bookings'
-import { format } from 'date-fns'
+import { useInstructorBookings, useWeatherConflicts, useApproveProposal, useRejectProposalAsInstructor } from '@/lib/queries/bookings'
+import { formatLocalTime } from '@/lib/utils/date'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertTriangle, CloudRain } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { ProposalAccordion } from '@/components/proposals'
 
 /**
  * Instructor Bookings List Component
@@ -18,6 +19,9 @@ import Link from 'next/link'
 export function InstructorBookingsList({ instructorId }: { instructorId: string }) {
   const { data: bookings, isLoading, error } = useInstructorBookings(instructorId)
   const { data: conflicts } = useWeatherConflicts(instructorId)
+  const { mutate: approveProposal, isPending: isApproving } = useApproveProposal()
+  const { mutate: rejectProposal, isPending: isRejecting } = useRejectProposalAsInstructor()
+  const [expandedConflict, setExpandedConflict] = useState<string | null>(null)
 
   // Create a map of booking IDs to their weather conflicts
   const weatherConflictMap = useMemo(() => {
@@ -31,6 +35,23 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
     }
     return map
   }, [conflicts])
+
+  // Handlers for proposal actions
+  const handleApproveProposal = async (proposalId: string, bookingId?: string) => {
+    if (!bookingId) {
+      console.error('Booking ID is required for approval')
+      return
+    }
+    if (confirm('Approve this reschedule proposal? The booking will be updated automatically.')) {
+      approveProposal({ proposalId, bookingId })
+    }
+  }
+
+  const handleRejectProposal = (proposalId: string) => {
+    if (confirm('Reject this proposal? The student will be notified.')) {
+      rejectProposal(proposalId)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -76,103 +97,121 @@ export function InstructorBookingsList({ instructorId }: { instructorId: string 
       {bookings.map((booking: any) => {
         const weatherConflict = weatherConflictMap.get(booking.id)
         const hasWeatherIssue = !!weatherConflict
+        const proposals = weatherConflict?.reschedule_proposals || []
 
         return (
-          <Link key={booking.id} href={`/dashboard/booking/${booking.id}`}>
-            <Card
-              className={`hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
-            >
-              <CardContent>
-                {/* Header with student name and status */}
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                        👤 {booking.student?.name || 'Student Name'}
-                      </h3>
+          <div key={booking.id} className="space-y-3">
+            {/* Main Booking Card */}
+            <Link href={`/dashboard/booking/${booking.id}`}>
+              <Card
+                className={`hover:border-primary/50 hover:shadow-md transition-all cursor-pointer ${hasWeatherIssue ? 'border-destructive/30' : ''}`}
+              >
+                <CardContent>
+                  {/* Header with student name and status */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+                          👤 {booking.student?.name || 'Student Name'}
+                        </h3>
+                        {hasWeatherIssue && (
+                          <Badge variant="destructive" className="gap-1">
+                            <AlertTriangle className="h-3 w-3" />
+                            Weather
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {booking.student?.email || 'student@email.com'}
+                      </p>
                       {hasWeatherIssue && (
-                        <Badge variant="destructive" className="gap-1">
-                          <AlertTriangle className="h-3 w-3" />
-                          Weather
-                        </Badge>
+                        <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                          <CloudRain className="h-3 w-3" />
+                          {weatherConflict.conflict_reasons?.[0] || 'Weather conflict detected'}
+                        </p>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {booking.student?.email || 'student@email.com'}
-                    </p>
-                    {hasWeatherIssue && (
-                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
-                        <CloudRain className="h-3 w-3" />
-                        {weatherConflict.conflict_reasons?.[0] || 'Weather conflict detected'}
+                    <Badge 
+                      variant={
+                        hasWeatherIssue ? 'destructive' :
+                        booking.status === 'scheduled' 
+                          ? 'default' 
+                          : booking.status === 'pending'
+                          ? 'secondary'
+                          : booking.status === 'weather_hold' || booking.status === 'rescheduling'
+                          ? 'secondary'
+                          : 'outline'
+                      }
+                    >
+                      {hasWeatherIssue ? 'Weather Issue' : booking.status === 'pending' ? 'Needs Confirmation' : booking.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+
+                  {/* Lesson details */}
+                  <Card className="bg-muted/50 mb-3">
+                    <CardContent>
+                      <p className="font-medium text-foreground mb-1">
+                        {booking.lesson_type.replace('_', ' ').toUpperCase()}
                       </p>
-                    )}
-                  </div>
-                  <Badge 
-                    variant={
-                      hasWeatherIssue ? 'destructive' :
-                      booking.status === 'scheduled' 
-                        ? 'default' 
-                        : booking.status === 'pending'
-                        ? 'secondary'
-                        : booking.status === 'weather_hold' || booking.status === 'rescheduling'
-                        ? 'secondary'
-                        : 'outline'
-                    }
-                  >
-                    {hasWeatherIssue ? 'Weather Issue' : booking.status === 'pending' ? 'Needs Confirmation' : booking.status.replace('_', ' ')}
-                  </Badge>
-                </div>
+                      <p className="text-sm text-muted-foreground">
+                        Aircraft: {booking.aircraft?.registration || 'TBD'} ({booking.aircraft?.make} {booking.aircraft?.model})
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                {/* Lesson details */}
-                <Card className="bg-muted/50 mb-3">
-                  <CardContent>
-                    <p className="font-medium text-foreground mb-1">
-                      {booking.lesson_type.replace('_', ' ').toUpperCase()}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Aircraft: {booking.aircraft?.registration || 'TBD'} ({booking.aircraft?.make} {booking.aircraft?.model})
-                    </p>
-                  </CardContent>
-                </Card>
+                  {/* Schedule info */}
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <span>📅</span>
+                      <span className="font-medium">
+                        {formatLocalTime(booking.scheduled_start, 'EEE, MMM d, yyyy')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>🕐</span>
+                      <span className="font-medium">
+                        {formatLocalTime(booking.scheduled_start, 'h:mm a')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>⏱️</span>
+                      <span>{booking.duration_minutes || 60} min</span>
+                    </div>
+                  </div>
 
-                {/* Schedule info */}
-                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <span>📅</span>
-                    <span className="font-medium">
-                      {format(new Date(booking.scheduled_start), 'EEE, MMM d, yyyy')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span>🕐</span>
-                    <span className="font-medium">
-                      {format(new Date(booking.scheduled_start), 'h:mm a')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span>⏱️</span>
-                    <span>{booking.duration_minutes || 60} min</span>
-                  </div>
-                </div>
+                  {/* Status indicators */}
+                  {booking.status === 'pending' && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-sm text-primary/80 flex items-center gap-1">
+                        ⏳ Awaiting your confirmation - Click to review
+                      </p>
+                    </div>
+                  )}
+                  {booking.status === 'weather_hold' && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-sm text-destructive/80 flex items-center gap-1">
+                        ⚠️ Weather hold - Reschedule proposals available
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
 
-                {/* Status indicators */}
-                {booking.status === 'pending' && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-sm text-primary/80 flex items-center gap-1">
-                      ⏳ Awaiting your confirmation - Click to review
-                    </p>
-                  </div>
-                )}
-                {booking.status === 'weather_hold' && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-sm text-destructive/80 flex items-center gap-1">
-                      ⚠️ Weather hold - Reschedule proposals available
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
+            {/* Inline ProposalAccordion for weather conflicts */}
+            {hasWeatherIssue && (
+              <ProposalAccordion
+                conflict={weatherConflict}
+                booking={booking}
+                proposals={proposals}
+                onAccept={handleApproveProposal}
+                onReject={handleRejectProposal}
+                isLoading={isApproving || isRejecting}
+                variant="instructor"
+                defaultOpen={expandedConflict === weatherConflict.id}
+              />
+            )}
+          </div>
         )
       })}
     </div>
