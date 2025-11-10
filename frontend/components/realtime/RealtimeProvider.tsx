@@ -344,7 +344,7 @@ export function useAdminRealtimeSubscription() {
 
   const debouncedInvalidateAdminUsers = useCallback(
     debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      queryClient.invalidateQueries({ queryKey: ['users'] })
     }, 1000), // Even longer for user changes
     [queryClient]
   )

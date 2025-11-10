@@ -1,33 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { AdminRealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { UserList } from '@/components/user/UserList'
 import { UserDetailDialog } from '@/components/user/UserDetailDialog'
 import { AdminCreateDialog } from '@/components/user/AdminCreateDialog'
 import { useAllUsers, useUsersByRole, type User } from '@/lib/queries/users'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
+import { TabsWithVariant, TabsContent, TabsList, TabsTrigger } from '@/components/kibo-ui/tabs'
+import { Card, CardContent } from '@/components/kibo-ui/card'
+import { Badge } from '@/components/kibo-ui/badge'
+import { Separator } from '@/components/kibo-ui/separator'
+import { Button } from '@/components/kibo-ui/button'
 import { ShieldPlus } from 'lucide-react'
-
-interface UserManagementClientProps {
-  userId: string
-}
 
 /**
  * User Management Client Component
  * 
  * Client-side portion of the user management interface with:
- * - Real-time subscription via RealtimeProvider
- * - Tab-based navigation for different views
+ * - Real-time subscription via AdminRealtimeProvider for system-wide updates
+ * - Tab-based navigation for different views (All Users, Students, Instructors, Admins)
  * - User list with search and filters
- * - User detail view
- * - User creation and editing
+ * - User detail view dialog
+ * - Admin account creation dialog
+ * 
+ * Real-time Features:
+ * - Automatically updates when users are created, updated, or deleted
+ * - Shows connection status in the footer badge
+ * - Debounced invalidation to prevent excessive re-renders
  */
-export function UserManagementClient({ userId }: UserManagementClientProps) {
+export function UserManagementClient() {
   const [activeTab, setActiveTab] = useState('all-users')
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
@@ -45,7 +46,7 @@ export function UserManagementClient({ userId }: UserManagementClientProps) {
   }
 
   return (
-    <RealtimeProvider userId={userId}>
+    <AdminRealtimeProvider>
       <div className="space-y-6">
         {/* Header with Create Admin Button */}
         <div className="flex items-center justify-between">
@@ -65,31 +66,40 @@ export function UserManagementClient({ userId }: UserManagementClientProps) {
         </div>
 
         {/* Tab Navigation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-            <TabsTrigger value="all-users" className="flex items-center gap-2">
-              👥 All Users
-              <Badge variant="secondary" className="ml-1">
-                {allUsers?.length || 0}
-              </Badge>
+        <TabsWithVariant 
+          value={activeTab} 
+          onValueChange={setActiveTab} 
+          withHUD={true}
+          className="w-full"
+        >
+          <TabsList>
+            <TabsTrigger 
+              value="all-users" 
+              icon={<span>👥</span>}
+              badge={allUsers?.length || 0}
+            >
+              All Users
             </TabsTrigger>
-            <TabsTrigger value="students" className="flex items-center gap-2">
-              🎓 Students
-              <Badge variant="secondary" className="ml-1">
-                {students?.length || 0}
-              </Badge>
+            <TabsTrigger 
+              value="students" 
+              icon={<span>🎓</span>}
+              badge={students?.length || 0}
+            >
+              Students
             </TabsTrigger>
-            <TabsTrigger value="instructors" className="flex items-center gap-2">
-              🧑‍✈️ Instructors
-              <Badge variant="secondary" className="ml-1">
-                {instructors?.length || 0}
-              </Badge>
+            <TabsTrigger 
+              value="instructors" 
+              icon={<span>🧑‍✈️</span>}
+              badge={instructors?.length || 0}
+            >
+              Instructors
             </TabsTrigger>
-            <TabsTrigger value="admins" className="flex items-center gap-2">
-              🎯 Admins
-              <Badge variant="secondary" className="ml-1">
-                {admins?.length || 0}
-              </Badge>
+            <TabsTrigger 
+              value="admins" 
+              icon={<span>🎯</span>}
+              badge={admins?.length || 0}
+            >
+              Admins
             </TabsTrigger>
           </TabsList>
 
@@ -112,15 +122,15 @@ export function UserManagementClient({ userId }: UserManagementClientProps) {
           <TabsContent value="admins" className="mt-6">
             <UserList roleFilter="admin" onUserSelect={handleUserSelect} />
           </TabsContent>
-        </Tabs>
+        </TabsWithVariant>
 
         {/* System Status Footer */}
-        <Card>
+        <Card withCorners withGrid={false} withGlow>
           <CardContent className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Badge variant="default" className="bg-primary">
-                  <span className="inline-block w-2 h-2 rounded-full bg-primary-foreground mr-2"></span>
+                  <span className="inline-block w-2 h-2 rounded-full bg-primary-foreground mr-2 animate-pulse"></span>
                   Real-time updates active
                 </Badge>
               </div>
@@ -129,7 +139,7 @@ export function UserManagementClient({ userId }: UserManagementClientProps) {
                 User data synchronized
               </span>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground font-mono">
               Last updated: {new Date().toLocaleTimeString()}
             </div>
           </CardContent>
@@ -148,7 +158,7 @@ export function UserManagementClient({ userId }: UserManagementClientProps) {
         open={createAdminDialogOpen}
         onOpenChange={setCreateAdminDialogOpen}
       />
-    </RealtimeProvider>
+    </AdminRealtimeProvider>
   )
 }
 

@@ -107,7 +107,7 @@ export default async function UserManagementPage() {
         </Card>
 
         {/* Client-side User Management Content */}
-        <UserManagementClient userId={user.id} />
+        <UserManagementClient />
       </main>
     </div>
   )

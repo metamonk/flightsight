@@ -4,17 +4,17 @@ import { useState, useMemo } from 'react'
 import { Search, UserPlus, Ban } from 'lucide-react'
 import { useAllUsers, type User } from '@/lib/queries/users'
 import { RoleBadge } from '@/components/shared/RoleBadge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/kibo-ui/card'
+import { Input } from '@/components/kibo-ui/input'
+import { Button } from '@/components/kibo-ui/button'
+import { Badge } from '@/components/kibo-ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/kibo-ui/select'
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/kibo-ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface UserListProps {
@@ -43,7 +43,7 @@ interface UserListProps {
  * - Click handlers for user selection
  */
 export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
-  const { data: users, isLoading } = useAllUsers()
+  const { data: users, isLoading, error, refetch } = useAllUsers()
   const [searchQuery, setSearchQuery] = useState('')
   const [localRoleFilter, setLocalRoleFilter] = useState<string>(roleFilter)
 
@@ -95,7 +95,7 @@ export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-40" />
         </div>
-        <Card>
+        <Card withCorners withGrid>
           <CardContent className="p-0">
             <div className="space-y-2 p-6">
               {[...Array(5)].map((_, i) => (
@@ -105,6 +105,35 @@ export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
           </CardContent>
         </Card>
       </div>
+    )
+  }
+
+  // Error state with retry option
+  if (error) {
+    return (
+      <Card withCorners className="border-destructive/50">
+        <CardContent>
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h3 className="text-lg font-semibold mb-2 text-destructive">
+              Failed to Load Users
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {error instanceof Error 
+                ? error.message 
+                : 'There was an error loading the user list. Please try again.'}
+            </p>
+            <Button 
+              onClick={() => refetch()} 
+              variant="outline"
+              className="gap-2"
+            >
+              <span>🔄</span>
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -149,7 +178,7 @@ export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
       </div>
 
       {/* User Table */}
-      <Card>
+      <Card withCorners withGrid>
         <CardContent className="p-0">
           {filteredUsers.length === 0 ? (
             <div className="text-center py-12">
@@ -162,7 +191,7 @@ export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
+              <Table withHUD>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
@@ -211,10 +240,10 @@ export function UserList({ roleFilter = 'all', onUserSelect }: UserListProps) {
                       <TableCell className="text-muted-foreground">
                         {user.phone || '—'}
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
+                      <TableCell className="text-muted-foreground text-sm font-mono">
                         {formatDate(user.created_at)}
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
+                      <TableCell className="text-muted-foreground text-sm font-mono">
                         {user.last_login_at 
                           ? formatDate(user.last_login_at) 
                           : 'Never'}
