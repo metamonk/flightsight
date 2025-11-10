@@ -237,22 +237,33 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Book a Flight Lesson</DialogTitle>
-          <DialogDescription>
-            Step {['date', 'time', 'resources', 'details', 'review'].indexOf(currentStep) + 1} of 5
-          </DialogDescription>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border-primary/30">
+        {/* HUD Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(100,150,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(100,150,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+        
+        {/* Corner Brackets */}
+        <div className="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-2 border-l-2 border-primary pointer-events-none z-10" />
+        <div className="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-2 border-r-2 border-primary pointer-events-none z-10" />
+        <div className="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-2 border-l-2 border-primary pointer-events-none z-10" />
+        <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-2 border-r-2 border-primary pointer-events-none z-10" />
+        
+        <DialogHeader className="relative">
+          <div className="flex items-center justify-between">
+            <DialogTitle>Book a Flight Lesson</DialogTitle>
+            <span className="text-sm font-mono text-muted-foreground">
+              Step {['date', 'time', 'resources', 'details', 'review'].indexOf(currentStep) + 1} of 5
+            </span>
+          </div>
           
-          {/* Progress indicator */}
-          <div className="flex gap-2 mt-4">
+          {/* HUD-styled Progress indicator */}
+          <div className="flex gap-1 mt-4">
             {['date', 'time', 'resources', 'details', 'review'].map((step, index) => (
               <div
                 key={step}
-                className={`h-1.5 flex-1 rounded-full transition-colors ${
+                className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                   ['date', 'time', 'resources', 'details', 'review'].indexOf(currentStep) >= index
-                    ? 'bg-primary'
-                    : 'bg-muted'
+                    ? 'bg-primary shadow-[0_0_8px_rgba(100,180,255,0.5)]'
+                    : 'bg-muted/30'
                 }`}
               />
             ))}
@@ -268,7 +279,7 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
                 <h3 className="text-lg font-semibold">Select a Date</h3>
               </div>
               
-              <Alert>
+              <Alert variant="hud">
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   Choose the date for your flight lesson
@@ -381,14 +392,14 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
               </div>
               
               {availableInstructorsLoading ? (
-                <Alert>
+                <Alert variant="hud">
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     Checking instructor availability...
                   </AlertDescription>
                 </Alert>
               ) : instructors.length > 0 ? (
-                <Alert>
+                <Alert variant="hud">
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     {instructors.length} instructor{instructors.length === 1 ? '' : 's'} available for your selected time
@@ -625,7 +636,7 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
                 </CardContent>
               </Card>
               
-              <Alert>
+              <Alert variant="hud">
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   Your booking will be sent to the instructor for approval

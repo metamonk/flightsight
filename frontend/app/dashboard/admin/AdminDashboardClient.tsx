@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { AdminRealtimeProvider } from '@/components/realtime/RealtimeProvider'
 import { AnalyticsOverview } from '@/components/analytics/AnalyticsOverview'
 import { DashboardFilters, FilterState, applyFilters } from '@/components/analytics/DashboardFilters'
 import { BookingsTable } from '@/components/analytics/BookingsTable'
@@ -12,14 +12,14 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
 interface AdminDashboardClientProps {
-  userId: string
+  // No props needed - admin sees system-wide data
 }
 
 /**
  * Admin Dashboard Client Component
  * 
  * Client-side portion of the admin dashboard with:
- * - Real-time subscription via RealtimeProvider
+ * - Real-time subscription via AdminRealtimeProvider
  * - Interactive filtering and search
  * - Analytics overview section
  * - Detailed bookings table
@@ -31,7 +31,7 @@ const getDefaultDateRange = () => ({
   endDate: new Date().toISOString().split('T')[0],
 })
 
-export function AdminDashboardClient({ userId }: AdminDashboardClientProps) {
+export function AdminDashboardClient({}: AdminDashboardClientProps) {
   const [filters, setFilters] = useState<FilterState>({
     dateRange: getDefaultDateRange(),
     status: {
@@ -48,7 +48,7 @@ export function AdminDashboardClient({ userId }: AdminDashboardClientProps) {
   const filteredBookings = bookings ? applyFilters(bookings, filters) : []
 
   return (
-    <RealtimeProvider userId={userId}>
+    <AdminRealtimeProvider>
       <div className="space-y-6">
         {/* Tab Navigation using shadcn Tabs */}
         <Tabs defaultValue="overview" className="w-full">
@@ -123,7 +123,7 @@ export function AdminDashboardClient({ userId }: AdminDashboardClientProps) {
           </CardContent>
         </Card>
       </div>
-    </RealtimeProvider>
+    </AdminRealtimeProvider>
   )
 }
 

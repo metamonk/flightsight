@@ -115,7 +115,7 @@ export default async function AdminDashboard() {
         </Card>
 
         {/* Client-side Dashboard Content */}
-        <AdminDashboardClient userId={user.id} />
+        <AdminDashboardClient />
       </main>
     </div>
   )
