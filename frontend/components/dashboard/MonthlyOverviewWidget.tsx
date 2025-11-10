@@ -266,6 +266,7 @@ export function MonthlyOverviewWidget({
                 key={feature.id}
                 onClick={() => handleFeatureClick(feature)}
                 className="w-full text-left hover:opacity-80 transition-opacity"
+                aria-label={`${feature.name} on ${format(feature.startAt, 'MMMM d, yyyy')} - ${feature.status.name}`}
               >
                 <CalendarItem 
                   feature={feature} 
