@@ -19,7 +19,8 @@ import type { CalendarConfig } from '@schedule-x/calendar'
  */
 export const defaultCalendarConfig: Partial<CalendarConfig> = {
   // Week starts on Sunday (US standard for flight training)
-  firstDayOfWeek: 0,
+  // Note: Schedule-X uses ISO standard where 1=Monday, 7=Sunday
+  firstDayOfWeek: 7,
   
   // Use system locale
   locale: 'en-US',
