@@ -52,8 +52,8 @@ function calculateConflictPositions(
   viewMode: string
 ): ConflictPosition[] {
   return conflicts.map(conflict => {
-    const start = Temporal.ZonedDateTime.from(conflict.booking.scheduled_start)
-    const end = Temporal.ZonedDateTime.from(conflict.booking.scheduled_end)
+    const start = Temporal.Instant.from(conflict.booking.scheduled_start).toZonedDateTimeISO('UTC')
+    const end = Temporal.Instant.from(conflict.booking.scheduled_end).toZonedDateTimeISO('UTC')
     
     // Calculate day of week (0-6, Sunday = 0)
     const dayOfWeek = start.dayOfWeek % 7

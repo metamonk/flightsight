@@ -60,8 +60,9 @@ export function transformBookingToEvent(
   hasWeatherConflict: boolean = false
 ): CalendarEvent {
   // Convert UTC ISO strings to Temporal ZonedDateTime
-  const start = Temporal.ZonedDateTime.from(booking.scheduled_start)
-  const end = Temporal.ZonedDateTime.from(booking.scheduled_end)
+  // Parse ISO strings as Instant first, then convert to ZonedDateTime in UTC
+  const start = Temporal.Instant.from(booking.scheduled_start).toZonedDateTimeISO('UTC')
+  const end = Temporal.Instant.from(booking.scheduled_end).toZonedDateTimeISO('UTC')
   
   // Build title with instructor and aircraft info
   const parts = [
@@ -133,8 +134,8 @@ export function transformBookingsToEvents(
 export function transformConflictToBackground(
   conflict: WeatherConflictData
 ): CalendarEvent {
-  const start = Temporal.ZonedDateTime.from(conflict.booking.scheduled_start)
-  const end = Temporal.ZonedDateTime.from(conflict.booking.scheduled_end)
+  const start = Temporal.Instant.from(conflict.booking.scheduled_start).toZonedDateTimeISO('UTC')
+  const end = Temporal.Instant.from(conflict.booking.scheduled_end).toZonedDateTimeISO('UTC')
   
   // Build description with weather reasons
   const description = [

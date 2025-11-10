@@ -470,13 +470,25 @@ export const GanttSidebarItem: FC<GanttSidebarItemProps> = ({
   className,
 }) => {
   const gantt = useContext(GanttContext);
+  
+  // Validate dates before processing
+  const startAt = feature.startAt instanceof Date ? feature.startAt : new Date(feature.startAt);
+  const endAt = feature.endAt instanceof Date ? feature.endAt : (feature.endAt ? new Date(feature.endAt) : null);
+  
+  // Check if dates are valid
+  const isValidStart = startAt instanceof Date && !isNaN(startAt.getTime());
+  const isValidEnd = endAt instanceof Date && !isNaN(endAt.getTime());
+  
   const tempEndAt =
-    feature.endAt && isSameDay(feature.startAt, feature.endAt)
-      ? addDays(feature.endAt, 1)
-      : feature.endAt;
-  const duration = tempEndAt
-    ? formatDistance(feature.startAt, tempEndAt)
-    : `${formatDistance(feature.startAt, new Date())} so far`;
+    endAt && isValidEnd && isSameDay(startAt, endAt)
+      ? addDays(endAt, 1)
+      : endAt;
+  
+  const duration = isValidStart 
+    ? (tempEndAt && isValidEnd
+        ? formatDistance(startAt, tempEndAt)
+        : `${formatDistance(startAt, new Date())} so far`)
+    : 'Invalid date';
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (event) => {
     if (event.target === event.currentTarget) {

@@ -11,7 +11,8 @@
     "validate": "pnpm run type-check && pnpm run lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:a11y": "vitest run tests/components/accessibility"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -64,6 +65,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.11.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@testing-library/jest-dom": "^6.6.3",
@@ -76,8 +78,10 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "^3.0.5",
+    "axe-core": "^4.11.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "jest-axe": "^10.0.0",
     "jsdom": "^25.0.1",
     "react-big-calendar": "^1.19.4",
     "tailwindcss": "^4",

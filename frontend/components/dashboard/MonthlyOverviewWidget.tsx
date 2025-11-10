@@ -249,6 +249,7 @@ export function MonthlyOverviewWidget({
           <CalendarBody features={features}>
             {({ feature }) => (
               <button
+                key={feature.id}
                 onClick={() => handleFeatureClick(feature)}
                 className="w-full text-left hover:opacity-80 transition-opacity"
               >

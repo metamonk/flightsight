@@ -253,7 +253,7 @@ export async function requestReschedule(
   // Verify user is either the student or instructor for this booking
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('student_id, instructor_id, status, scheduled_start, scheduled_end')
+    .select('student_id, instructor_id, status, scheduled_start, scheduled_end, lesson_notes')
     .eq('id', bookingId)
     .single()
 

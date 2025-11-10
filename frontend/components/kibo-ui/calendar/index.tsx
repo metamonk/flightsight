@@ -239,7 +239,10 @@ export const CalendarBody = ({ features, children }: CalendarBodyProps) => {
     const result: { [day: number]: Feature[] } = {};
     for (let day = 1; day <= daysInMonth; day++) {
       result[day] = features.filter((feature) => {
-        return isSameDay(new Date(feature.endAt), new Date(year, month, day));
+        // Ensure endAt is a valid Date object
+        const endDate = feature.endAt instanceof Date ? feature.endAt : new Date(feature.endAt);
+        const isValid = !isNaN(endDate.getTime());
+        return isValid && isSameDay(endDate, new Date(year, month, day));
       });
     }
     return result;

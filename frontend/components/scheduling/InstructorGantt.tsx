@@ -39,6 +39,15 @@ export interface Instructor {
   avatar_url?: string
 }
 
+// Export GanttItem type for use by parent components
+export type GanttItem = {
+  id: string
+  featureId: string
+  title: string
+  start: Date
+  end: Date
+}
+
 export interface InstructorGanttProps {
   /** Instructors to display as rows */
   instructors: Instructor[]
@@ -104,24 +113,50 @@ function transformToGanttFeatures(
     )
     
     // Create features for available slots
-    const availableFeatures: KiboGanttFeature[] = instructorAvailability.map(avail => ({
-      id: `availability-${avail.id}`,
-      name: `${instructor.full_name} - Available`,
-      startAt: new Date(avail.start_time),
-      endAt: new Date(avail.end_time),
-      status: STATUS_AVAILABLE,
-      lane: instructor.id // Group by instructor
-    }))
+    const availableFeatures: KiboGanttFeature[] = instructorAvailability
+      .map(avail => {
+        const startDate = new Date(avail.start_time)
+        const endDate = new Date(avail.end_time)
+        
+        // Validate dates
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          console.warn(`Invalid dates for availability ${avail.id}:`, avail.start_time, avail.end_time)
+          return null
+        }
+        
+        return {
+          id: `availability-${avail.id}`,
+          name: `${instructor.full_name} - Available`,
+          startAt: startDate,
+          endAt: endDate,
+          status: STATUS_AVAILABLE,
+          lane: instructor.id // Group by instructor
+        }
+      })
+      .filter((f): f is KiboGanttFeature => f !== null)
     
     // Create features for booked slots
-    const bookedFeatures: KiboGanttFeature[] = instructorBookings.map((booking: any) => ({
-      id: `booking-${booking.id}`,
-      name: `${instructor.full_name} - ${booking.lesson_type}`,
-      startAt: new Date(booking.scheduled_start),
-      endAt: new Date(booking.scheduled_end),
-      status: STATUS_BOOKED,
-      lane: instructor.id // Group by instructor
-    }))
+    const bookedFeatures: KiboGanttFeature[] = instructorBookings
+      .map((booking: any) => {
+        const startDate = new Date(booking.scheduled_start)
+        const endDate = new Date(booking.scheduled_end)
+        
+        // Validate dates
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          console.warn(`Invalid dates for booking ${booking.id}:`, booking.scheduled_start, booking.scheduled_end)
+          return null
+        }
+        
+        return {
+          id: `booking-${booking.id}`,
+          name: `${instructor.full_name} - ${booking.lesson_type}`,
+          startAt: startDate,
+          endAt: endDate,
+          status: STATUS_BOOKED,
+          lane: instructor.id // Group by instructor
+        }
+      })
+      .filter((f): f is KiboGanttFeature => f !== null)
     
     return [...availableFeatures, ...bookedFeatures]
   })

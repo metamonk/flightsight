@@ -2,8 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
-import { RealtimeProvider } from '@/components/realtime/RealtimeProvider'
-import { StudentDashboardClient } from './StudentDashboardClient'
+import { StudentDashboardClient, StudentBookingsView } from './StudentDashboardClient'
 import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { MonthlyOverview, InstructorAvatarGroup } from '@/components/dashboard'
@@ -52,7 +51,6 @@ export default async function StudentDashboard() {
   }
 
   return (
-    <RealtimeProvider userId={user.id}>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -95,7 +93,7 @@ export default async function StudentDashboard() {
           </div>
         </header>
 
-        {/* Main Content */}
+      {/* Main Content - Wrapped in RealtimeProvider via StudentDashboardClient */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Banner */}
           <Card className="mb-8 border-0 bg-gradient-to-r from-primary/90 to-primary/70">
@@ -109,7 +107,8 @@ export default async function StudentDashboard() {
             </CardHeader>
           </Card>
 
-          {/* Dashboard Grid */}
+        {/* Dashboard Grid - Wrapped with Realtime Subscriptions */}
+        <StudentDashboardClient userId={user.id}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Upcoming Flights - with view toggle */}
             <div className="lg:col-span-2 space-y-6">
@@ -120,7 +119,7 @@ export default async function StudentDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <StudentDashboardClient userId={user.id} />
+                  <StudentBookingsView userId={user.id} />
                 </CardContent>
               </Card>
               
@@ -152,8 +151,8 @@ export default async function StudentDashboard() {
               </Card>
             </div>
           </div>
+        </StudentDashboardClient>
         </main>
       </div>
-    </RealtimeProvider>
   )
 }

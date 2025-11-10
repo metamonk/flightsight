@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
-import { InstructorRealtimeProvider } from '@/components/realtime/RealtimeProvider'
+import { InstructorDashboardClient } from './InstructorDashboardClient'
 import { InstructorBookingsList } from '@/components/booking/InstructorBookingsList'
 import { InstructorProposalsList } from '@/components/proposals/InstructorProposalsList'
 import { InstructorGanttView } from '@/components/scheduling/InstructorGanttView'
@@ -46,7 +46,6 @@ export default async function InstructorDashboard() {
   }
 
   return (
-    <InstructorRealtimeProvider instructorId={user.id}>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -89,7 +88,7 @@ export default async function InstructorDashboard() {
           </div>
         </header>
 
-        {/* Main Content */}
+      {/* Main Content - Wrapped in InstructorRealtimeProvider via InstructorDashboardClient */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Welcome Banner */}
           <Card className="mb-8 border-0 bg-gradient-to-r from-primary/90 to-primary/70">
@@ -103,6 +102,8 @@ export default async function InstructorDashboard() {
             </CardHeader>
           </Card>
 
+        {/* Dashboard Content - Wrapped with Realtime Subscriptions */}
+        <InstructorDashboardClient instructorId={user.id}>
           {/* Dashboard Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Upcoming Lessons */}
@@ -192,9 +193,9 @@ export default async function InstructorDashboard() {
               </CardContent>
             </Card>
           </div>
+        </InstructorDashboardClient>
         </main>
       </div>
-    </InstructorRealtimeProvider>
   )
 }
 
