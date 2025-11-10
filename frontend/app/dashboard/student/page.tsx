@@ -71,11 +71,6 @@ export default async function StudentDashboard() {
                 </Button>
               </BookingFormDialog>
               <Button variant="outline" size="default" asChild>
-                <Link href="/dashboard/student/calendar">
-                  📅 Calendar View
-                </Link>
-              </Button>
-              <Button variant="outline" size="default" asChild>
                 <Link href="/profile">
                   ⚙️ Settings
                 </Link>

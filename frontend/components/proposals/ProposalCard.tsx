@@ -118,24 +118,35 @@ export function ProposalCard({
       }
     >
       <CardContent>
+        {/* Semantic heading for screen readers */}
+        <h3 className="sr-only">
+          Proposal {rank + 1}: {proposedTime.date} at {proposedTime.timeRange}
+        </h3>
+        
         {/* Rank Badge & Score */}
         <div className="flex items-start justify-between mb-3">
           {variant === 'student' ? (
             <>
               <Badge variant={rankConfig.variant} className="gap-1">
-                <span>{rankConfig.emoji}</span>
+                <span aria-hidden="true">{rankConfig.emoji}</span>
                 <span>{rankConfig.label}</span>
               </Badge>
-              <span className="text-xs text-muted-foreground">
+              <span 
+                className="text-xs text-muted-foreground"
+                aria-label={`AI confidence score: ${Math.round(proposal.score || 0)} out of 100`}
+              >
                 Score: {Math.round((proposal.score || 0))}
               </span>
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="text-lg">{rankConfig.emoji}</span>
+              <span className="text-lg" aria-hidden="true">{rankConfig.emoji}</span>
               <div>
                 <p className="font-medium text-foreground">{proposedTime.date} • {proposedTime.timeRange}</p>
-                <p className="text-xs text-muted-foreground">
+                <p 
+                  className="text-xs text-muted-foreground"
+                  aria-label={`AI confidence score: ${Math.round(proposal.score || 0)} out of 100`}
+                >
                   AI Score: {Math.round((proposal.score || 0))}
                 </p>
               </div>
@@ -147,7 +158,7 @@ export function ProposalCard({
             <>
               {isAccepted && (
                 <Badge variant="default">
-                  ✓ Approved
+                  <span aria-hidden="true">✓</span> Approved
                 </Badge>
               )}
               {isRejected && (
@@ -231,7 +242,7 @@ export function ProposalCard({
             <Badge
               variant={isAccepted ? 'default' : 'secondary'}
             >
-              {isAccepted ? '✓ Accepted' : 'Declined'}
+              {isAccepted ? <><span aria-hidden="true">✓</span> Accepted</> : 'Declined'}
             </Badge>
           </div>
         )}

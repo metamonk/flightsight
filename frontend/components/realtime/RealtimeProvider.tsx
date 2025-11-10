@@ -40,34 +40,11 @@ function debounce<T extends (...args: any[]) => void>(
  */
 export function useRealtimeSubscription(userId: string) {
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const maxReconnectAttempts = 5
   const reconnectDelayRef = useRef(1000) // Start with 1 second
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected')
-
-  // Debounced query invalidation functions
-  const debouncedInvalidateBookings = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['bookings', userId] })
-    }, 300),
-    [queryClient, userId]
-  )
-
-  const debouncedInvalidateConflicts = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['weather-conflicts', userId] })
-    }, 300),
-    [queryClient, userId]
-  )
-
-  const debouncedInvalidateProposals = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['proposals'] })
-    }, 300),
-    [queryClient]
-  )
 
   // Reconnection logic with exponential backoff
   const reconnect = useCallback(() => {
@@ -99,6 +76,21 @@ export function useRealtimeSubscription(userId: string) {
 
     console.log(`🔌 Setting up realtime subscriptions for user: ${userId}`)
 
+    const supabase = createClient()
+
+    // Create debounced invalidation functions inside the effect
+    const debouncedInvalidateBookings = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['bookings', userId] })
+    }, 300)
+
+    const debouncedInvalidateConflicts = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['weather-conflicts', userId] })
+    }, 300)
+
+    const debouncedInvalidateProposals = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['proposals'] })
+    }, 300)
+
     // Create a channel for this user's data
     const channel = supabase
       .channel(`user-${userId}-updates`)
@@ -114,7 +106,10 @@ export function useRealtimeSubscription(userId: string) {
         },
         (payload) => {
           console.log('📅 Booking changed (as student):', payload.eventType, (payload.new as any)?.id)
+          // Invalidate all related queries when bookings change
           debouncedInvalidateBookings()
+          debouncedInvalidateConflicts()
+          debouncedInvalidateProposals()
         }
       )
 
@@ -129,65 +124,16 @@ export function useRealtimeSubscription(userId: string) {
         },
         (payload) => {
           console.log('📅 Booking changed (as instructor):', payload.eventType, (payload.new as any)?.id)
+          // Invalidate all related queries when bookings change
           debouncedInvalidateBookings()
-        }
-      )
-
-      // Listen for new weather conflicts
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'weather_conflicts',
-        },
-        (payload) => {
-          console.log('⚠️ New weather conflict detected:', (payload.new as any)?.id)
           debouncedInvalidateConflicts()
-        }
-      )
-
-      // Listen for weather conflict updates (resolved status)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'weather_conflicts',
-        },
-        (payload) => {
-          console.log('✏️ Weather conflict updated:', (payload.new as any)?.id, (payload.new as any)?.resolved)
-          debouncedInvalidateConflicts()
-        }
-      )
-
-      // Listen for new reschedule proposals
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'reschedule_proposals',
-        },
-        (payload) => {
-          console.log('💡 New proposal received:', (payload.new as any)?.id)
           debouncedInvalidateProposals()
         }
       )
 
-      // Listen for proposal status changes
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'reschedule_proposals',
-        },
-        (payload) => {
-          console.log('📝 Proposal updated:', (payload.new as any)?.id, (payload.new as any)?.status)
-          debouncedInvalidateProposals()
-        }
-      )
+      // Note: Weather conflicts and proposals are fetched via bookings relationship
+      // When bookings change, we invalidate conflicts and proposals accordingly
+      // This approach avoids RLS permission issues with direct subscriptions
 
       .subscribe((status, error) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
@@ -223,7 +169,7 @@ export function useRealtimeSubscription(userId: string) {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [userId, queryClient, supabase, debouncedInvalidateBookings, debouncedInvalidateConflicts, debouncedInvalidateProposals, reconnect])
+  }, [userId, queryClient, reconnect])
 
   return { connectionStatus }
 }
@@ -241,34 +187,11 @@ export function useRealtimeSubscription(userId: string) {
  */
 export function useInstructorRealtimeSubscription(instructorId: string) {
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const maxReconnectAttempts = 5
   const reconnectDelayRef = useRef(1000)
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected')
-
-  // Debounced query invalidation functions
-  const debouncedInvalidateInstructorBookings = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['instructor-bookings', instructorId] })
-    }, 300),
-    [queryClient, instructorId]
-  )
-
-  const debouncedInvalidateInstructorProposals = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['instructor-proposals', instructorId] })
-    }, 300),
-    [queryClient, instructorId]
-  )
-
-  const debouncedInvalidateConflicts = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['weather-conflicts', instructorId] })
-    }, 300),
-    [queryClient, instructorId]
-  )
 
   // Reconnection logic with exponential backoff
   const reconnect = useCallback(() => {
@@ -299,6 +222,21 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
 
     console.log(`🔌 Setting up instructor realtime subscriptions for: ${instructorId}`)
 
+    const supabase = createClient()
+
+    // Create debounced invalidation functions inside the effect
+    const debouncedInvalidateBookings = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-bookings', instructorId] })
+    }, 300)
+
+    const debouncedInvalidateConflicts = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['weather-conflicts', instructorId] })
+    }, 300)
+
+    const debouncedInvalidateProposals = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['instructor-proposals', instructorId] })
+    }, 300)
+
     const channel = supabase
       .channel(`instructor-${instructorId}-updates`)
 
@@ -313,38 +251,16 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
         },
         (payload) => {
           console.log('👨‍🏫 Instructor booking changed:', payload.eventType, (payload.new as any)?.id)
-          debouncedInvalidateInstructorBookings()
-        }
-      )
-
-      // Listen for weather conflicts affecting instructor's bookings
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'weather_conflicts',
-        },
-        (payload) => {
-          console.log('⚠️ Weather conflict update:', payload.eventType, (payload.new as any)?.id)
+          // Invalidate bookings, and also invalidate conflicts/proposals since they're related to bookings
+          debouncedInvalidateBookings()
           debouncedInvalidateConflicts()
-          debouncedInvalidateInstructorProposals()
+          debouncedInvalidateProposals()
         }
       )
 
-      // Listen for proposal changes (especially student responses)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'reschedule_proposals',
-        },
-        (payload) => {
-          console.log('📝 Proposal updated for instructor:', (payload.new as any)?.id, (payload.new as any)?.student_response)
-          debouncedInvalidateInstructorProposals()
-        }
-      )
+      // Note: Weather conflicts and proposals are fetched via bookings relationship
+      // When bookings change, we invalidate conflicts and proposals accordingly
+      // This approach avoids RLS permission issues with direct subscriptions
 
       .subscribe((status, error) => {
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
@@ -379,7 +295,7 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [instructorId, queryClient, supabase, debouncedInvalidateInstructorBookings, debouncedInvalidateInstructorProposals, debouncedInvalidateConflicts, reconnect])
+  }, [instructorId, queryClient, reconnect])
 
   return { connectionStatus }
 }

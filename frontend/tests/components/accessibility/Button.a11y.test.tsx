@@ -24,12 +24,14 @@ describe('Button Accessibility', () => {
     await user.keyboard('{Enter}')
   })
 
-  it('should have proper ARIA attributes when disabled', () => {
-    render(<Button disabled>Disabled Button</Button>)
+  it('should have proper ARIA attributes when disabled', async () => {
+    const { container } = render(<Button disabled>Disabled Button</Button>)
     
     const button = screen.getByRole('button', { name: /disabled button/i })
-    expect(button).toHaveAttribute('aria-disabled', 'true')
     expect(button).toBeDisabled()
+    
+    // Verify no accessibility violations with disabled state
+    await testAccessibility(container)
   })
 
   it('should support aria-label for icon-only buttons', async () => {

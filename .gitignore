@@ -41,3 +41,9 @@ coverage/
 
 # Vercel
 .vercel
+
+.env
+
+# Task files
+# tasks.json
+# tasks/ 

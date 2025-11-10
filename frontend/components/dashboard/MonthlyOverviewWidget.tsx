@@ -202,9 +202,11 @@ export function MonthlyOverviewWidget({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CalendarIcon className="h-4 w-4" />
-              Monthly Overview
+            <CardTitle asChild>
+              <h2 className="flex items-center gap-2 text-base">
+                <CalendarIcon className="h-4 w-4" aria-hidden="true" />
+                Monthly Overview
+              </h2>
             </CardTitle>
             <CardDescription className="text-xs">
               {stats.total} booking{stats.total !== 1 ? 's' : ''} this month
@@ -212,20 +214,32 @@ export function MonthlyOverviewWidget({
           </div>
           
           {/* Quick Stats Badges */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" role="status" aria-label="Booking statistics">
             {stats.confirmed > 0 && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-green-50 text-green-700 border-green-200">
-                {stats.confirmed} ✓
+              <Badge 
+                variant="outline" 
+                className="text-[10px] px-1.5 py-0 bg-green-50 text-green-700 border-green-200"
+                aria-label={`${stats.confirmed} confirmed booking${stats.confirmed !== 1 ? 's' : ''}`}
+              >
+                {stats.confirmed} <span aria-hidden="true">✓</span>
               </Badge>
             )}
             {stats.pending > 0 && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-amber-50 text-amber-700 border-amber-200">
-                {stats.pending} ⏱
+              <Badge 
+                variant="outline" 
+                className="text-[10px] px-1.5 py-0 bg-amber-50 text-amber-700 border-amber-200"
+                aria-label={`${stats.pending} pending booking${stats.pending !== 1 ? 's' : ''}`}
+              >
+                {stats.pending} <span aria-hidden="true">⏱</span>
               </Badge>
             )}
             {stats.weather_conflict > 0 && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-700 border-red-200">
-                {stats.weather_conflict} ⚠️
+              <Badge 
+                variant="outline" 
+                className="text-[10px] px-1.5 py-0 bg-red-50 text-red-700 border-red-200"
+                aria-label={`${stats.weather_conflict} weather conflict${stats.weather_conflict !== 1 ? 's' : ''}`}
+              >
+                {stats.weather_conflict} <span aria-hidden="true">⚠️</span>
               </Badge>
             )}
           </div>
