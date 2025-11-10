@@ -61,7 +61,7 @@ export function AnalyticsOverview() {
       <Card className="border-destructive/50">
         <CardContent className="pt-6">
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">⚠️</div>
+            <div className="text-4xl mb-4" aria-hidden="true">⚠️</div>
             <h3 className="text-lg font-semibold mb-2 text-destructive">
               Failed to Load Analytics Data
             </h3>

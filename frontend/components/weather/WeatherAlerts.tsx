@@ -93,7 +93,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
   if (!conflicts || conflicts.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-4xl mb-2">☀️</div>
+        <div className="text-4xl mb-2" aria-hidden="true">☀️</div>
         <p className="text-muted-foreground text-sm">All clear! No weather conflicts.</p>
       </div>
     )

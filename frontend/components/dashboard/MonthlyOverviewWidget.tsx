@@ -297,7 +297,7 @@ export function MonthlyOverviewWidget({
         {/* Empty state */}
         {bookings.length === 0 && (
           <div className="text-center py-8">
-            <div className="text-4xl mb-2">📅</div>
+            <div className="text-4xl mb-2" aria-hidden="true">📅</div>
             <p className="text-sm font-medium text-muted-foreground">
               No bookings this month
             </p>
