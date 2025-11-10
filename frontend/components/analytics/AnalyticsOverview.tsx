@@ -6,6 +6,7 @@ import { ConflictsChart } from './ConflictsChart'
 import { InstructorActivityChart } from './InstructorActivityChart'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 import { 
   useSystemMetrics, 
   useBookingTrends, 
@@ -26,12 +27,13 @@ import {
  * All charts are responsive and update in real-time
  */
 export function AnalyticsOverview() {
-  const { data: metrics, isLoading: metricsLoading } = useSystemMetrics()
-  const { data: bookingTrends, isLoading: trendsLoading } = useBookingTrends()
-  const { data: conflictStats, isLoading: conflictsLoading } = useConflictStats()
-  const { data: instructorActivity, isLoading: activityLoading } = useInstructorActivity()
+  const { data: metrics, isLoading: metricsLoading, error: metricsError, refetch: refetchMetrics } = useSystemMetrics()
+  const { data: bookingTrends, isLoading: trendsLoading, error: trendsError, refetch: refetchTrends } = useBookingTrends()
+  const { data: conflictStats, isLoading: conflictsLoading, error: conflictsError, refetch: refetchConflicts } = useConflictStats()
+  const { data: instructorActivity, isLoading: activityLoading, error: activityError, refetch: refetchActivity } = useInstructorActivity()
 
   const isLoading = metricsLoading || trendsLoading || conflictsLoading || activityLoading
+  const hasError = metricsError || trendsError || conflictsError || activityError
 
   if (isLoading) {
     return (
@@ -50,6 +52,44 @@ export function AnalyticsOverview() {
           ))}
         </div>
       </div>
+    )
+  }
+
+  // Error state with retry options
+  if (hasError) {
+    return (
+      <Card className="border-destructive/50">
+        <CardContent className="pt-6">
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h3 className="text-lg font-semibold mb-2 text-destructive">
+              Failed to Load Analytics Data
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {metricsError instanceof Error ? metricsError.message :
+               trendsError instanceof Error ? trendsError.message :
+               conflictsError instanceof Error ? conflictsError.message :
+               activityError instanceof Error ? activityError.message :
+               'There was an error loading the analytics. Please try again.'}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button 
+                onClick={() => {
+                  refetchMetrics()
+                  refetchTrends()
+                  refetchConflicts()
+                  refetchActivity()
+                }} 
+                variant="outline"
+                className="gap-2"
+              >
+                <span>🔄</span>
+                Retry All
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 

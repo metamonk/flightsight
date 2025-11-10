@@ -5,6 +5,8 @@ import { useAllAirports } from '@/lib/queries/lookups'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -26,7 +28,7 @@ interface AirportListProps {
 }
 
 export function AirportList({ onAdd, onEdit, onDeactivate, onReactivate }: AirportListProps) {
-  const { data: airports = [], isLoading } = useAllAirports()
+  const { data: airports = [], isLoading, error, refetch } = useAllAirports()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
@@ -52,9 +54,46 @@ export function AirportList({ onAdd, onEdit, onDeactivate, onReactivate }: Airpo
 
   if (isLoading) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Loading airports...
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
       </div>
+    )
+  }
+
+  // Error state with retry
+  if (error) {
+    return (
+      <Card className="border-destructive/50">
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h3 className="text-lg font-semibold mb-2 text-destructive">
+              Failed to Load Airports
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {error instanceof Error 
+                ? error.message 
+                : 'There was an error loading the airports. Please try again.'}
+            </p>
+            <Button 
+              onClick={() => refetch()} 
+              variant="outline"
+              className="gap-2"
+            >
+              <span>🔄</span>
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     )
   }
 
