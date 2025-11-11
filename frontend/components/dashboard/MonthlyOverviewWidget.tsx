@@ -8,7 +8,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
+import { format } from 'date-fns'
 import {
   CalendarProvider,
   CalendarDate,
@@ -19,8 +19,7 @@ import {
   CalendarHeader,
   CalendarBody,
   CalendarItem,
-  type Feature,
-  type Status
+  type Feature
 } from '@/components/kibo-ui/calendar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -124,7 +123,7 @@ export function MonthlyOverviewWidget({
   error = null,
   className,
   showSkeleton = true,
-  onDayClick,
+  onDayClick: _onDayClick,
   onBookingClick,
   userRole = 'student'
 }: MonthlyOverviewWidgetProps) {

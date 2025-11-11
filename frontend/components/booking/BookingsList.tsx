@@ -22,7 +22,7 @@ export function BookingsList({ userId }: { userId: string }) {
   const { data: conflicts } = useWeatherConflicts(userId)
   const { mutate: acceptProposal, isPending: isAccepting } = useAcceptProposal()
   const { mutate: rejectProposal, isPending: isRejecting } = useRejectProposal()
-  const [expandedConflict, setExpandedConflict] = useState<string | null>(null)
+  const [expandedConflict] = useState<string | null>(null)
 
   // Create a map of booking IDs to their weather conflicts with proposals
   const weatherConflictMap = useMemo(() => {

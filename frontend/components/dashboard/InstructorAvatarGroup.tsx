@@ -8,7 +8,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useUsersByRole, type User } from '@/lib/queries/users'
+import { useUsersByRole } from '@/lib/queries/users'
 import { AvatarStack } from '@/components/kibo-ui/avatar-stack'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'

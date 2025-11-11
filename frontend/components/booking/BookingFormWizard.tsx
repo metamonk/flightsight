@@ -15,13 +15,12 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { 
   MiniCalendar, 
@@ -33,23 +32,20 @@ import { useInstructors, useAircraft } from '@/lib/queries/bookings'
 import { useAvailableInstructors } from '@/lib/queries/availability'
 import { useActiveAirports, useActiveLessonTypes } from '@/lib/queries/lookups'
 import { createBooking } from '@/app/booking/actions'
-import { localToUTC } from '@/lib/utils/date'
 import { toast } from 'sonner'
-import { 
-  Info, 
-  Calendar as CalendarIcon, 
-  Clock, 
-  Users, 
-  Plane, 
-  MapPin, 
-  BookOpen,
+import {
+  Info,
+  Calendar as CalendarIcon,
+  Clock,
+  Users,
+  Plane,
   Check,
   ChevronRight,
   ChevronLeft,
   AlertCircle
 } from 'lucide-react'
 import type { BookingFormData } from '@/lib/schemas/booking'
-import { format, addMinutes, setHours, setMinutes, isBefore, isAfter, startOfDay } from 'date-fns'
+import { format, addMinutes, setHours, setMinutes, isBefore } from 'date-fns'
 
 interface BookingFormWizardProps {
   open: boolean
@@ -613,7 +609,7 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
                     <div className="flex justify-between items-start py-2 border-b">
                       <span className="text-sm text-muted-foreground">Aircraft</span>
                       <span className="text-sm font-medium">
-                        {aircraft?.find((a: any) => a.id === formData.aircraft_id)?.tail_number || 'N/A'}
+                        {(aircraft?.find((a: any) => a.id === formData.aircraft_id) as any)?.tail_number || 'N/A'}
                       </span>
                     </div>
                     

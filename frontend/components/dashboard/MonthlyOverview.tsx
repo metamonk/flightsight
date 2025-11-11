@@ -96,7 +96,6 @@ export function MonthlyOverview({
   
   // Handle day click - could show day view or create booking
   const handleDayClick = (date: Date) => {
-    const formattedDate = format(date, 'yyyy-MM-dd')
     toast.info('Day selected', {
       description: `${format(date, 'MMMM d, yyyy')} - Click a booking for details`,
       duration: 2000
