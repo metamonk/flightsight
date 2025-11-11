@@ -182,7 +182,7 @@ export function useAcceptProposal() {
       // Show loading toast
       toast.loading('Accepting proposal and rescheduling...', { id: proposalId })
     },
-    onSuccess: (data, proposalId) => {
+    onSuccess: (_data, proposalId) => {
       // Dismiss loading toast and show success
       toast.success('✅ Proposal accepted! Your lesson has been rescheduled.', { 
         id: proposalId,

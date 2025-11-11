@@ -7,7 +7,7 @@
 
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react'
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop'
@@ -72,7 +72,7 @@ export function ScheduleXCalendarWrapper({
   defaultView = 'week',
   callbacks = {},
   enableDragDrop = true,
-  enableResize = false,
+  enableResize: _enableResize = false,
   minHoursAdvance = 1,
   enableLogging = false,
   className = '',

@@ -1,12 +1,11 @@
 'use client'
 
-import { Bell, Check, X, Trash2 } from 'lucide-react'
+import { Bell, Check, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,

@@ -7,7 +7,7 @@
 
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CalendarEvent } from '@schedule-x/calendar'
 import { toast } from 'sonner'
@@ -85,9 +85,7 @@ export function InstructorCalendarView({
    * Handle click on empty date/time slot
    * Instructors might want to set availability or view open slots
    */
-  const handleClickDateTime = useCallback((dateTime: Temporal.ZonedDateTime) => {
-    const isoString = dateTime.toString()
-    
+  const handleClickDateTime = useCallback((_dateTime: Temporal.ZonedDateTime) => {
     toast.info('📅 Open time slot', {
       description: 'Click "Manage Availability" to set your teaching hours',
       duration: 3000,

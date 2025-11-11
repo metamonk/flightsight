@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/accordion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { ProposalCard } from './ProposalCard'
 
 interface Proposal {
@@ -92,8 +91,6 @@ export function ProposalAccordion({
 
   // Get conflict status
   const isResolved = conflict.status === 'resolved'
-  const isAcknowledged = conflict.status === 'acknowledged'
-  const isDetected = conflict.status === 'detected'
 
   // Get number of pending proposals
   const pendingProposals = sortedProposals.filter(

@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 const TooltipProvider = TooltipPrimitive.Provider;
 const TooltipRoot = TooltipPrimitive.Root;
 const TooltipTrigger = TooltipPrimitive.Trigger;
-const TooltipPortal = TooltipPrimitive.Portal;
 
 export type TooltipProps = React.ComponentPropsWithoutRef<
   typeof TooltipPrimitive.Root
@@ -34,7 +33,7 @@ export type TooltipProps = React.ComponentPropsWithoutRef<
 const Tooltip = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Root>,
   TooltipProps
->(({ delayDuration = 200, children, ...props }, ref) => (
+>(({ delayDuration = 200, children, ...props }, _ref) => (
   <TooltipProvider delayDuration={delayDuration}>
     <TooltipRoot {...props}>{children}</TooltipRoot>
   </TooltipProvider>
@@ -154,7 +153,7 @@ const TooltipSimple = React.forwardRef<HTMLElement, TooltipSimpleProps>(
       showArrow = true,
       withHUD = false,
     },
-    ref
+    _ref
   ) => (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>

@@ -102,7 +102,7 @@ export function createValidationCallback(options?: {
     businessHoursEnd = 22 
   } = options || {}
   
-  return (oldEvent, newEvent) => {
+  return (_oldEvent, newEvent) => {
     const start = newEvent.start as Temporal.ZonedDateTime
     const end = newEvent.end as Temporal.ZonedDateTime
     const now = Temporal.Now.zonedDateTimeISO()

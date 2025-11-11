@@ -17,7 +17,7 @@ import {
 import { useInstructorBookings } from '@/lib/queries/bookings'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AlertCircle, Users, Edit, Trash2 } from 'lucide-react'
+import { AlertCircle, Users, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -214,20 +214,7 @@ export function InstructorGanttView({
       })
     }
   }
-  
-  // Trigger delete dialog
-  const handleDeleteClick = (item: GanttItem) => {
-    if (item.id.startsWith('booking-')) {
-      toast.error('Cannot delete bookings', {
-        description: 'Bookings must be canceled through the calendar'
-      })
-      return
-    }
-    
-    setItemToDelete(item)
-    setDeleteDialogOpen(true)
-  }
-  
+
   // Loading state
   if (availabilityLoading || bookingsLoading) {
     return showSkeleton ? (

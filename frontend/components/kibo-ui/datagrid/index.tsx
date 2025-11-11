@@ -2,9 +2,6 @@
 
 import * as React from "react";
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,

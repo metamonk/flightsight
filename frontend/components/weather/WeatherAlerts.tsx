@@ -6,10 +6,9 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AlertTriangle, Sparkles, Clock, CloudRain, Cloud, Wind, Eye, Gauge, Thermometer, Droplets, ChevronDown, ChevronUp } from 'lucide-react'
+import { AlertTriangle, Sparkles, Clock, Cloud, Wind, Eye, Gauge } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { ProposalCard } from '@/components/proposals/ProposalCard'
-import { useState } from 'react'
 
 /**
  * Weather Alerts Component with Inline Proposals

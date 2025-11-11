@@ -91,12 +91,6 @@ const STATUS_BOOKED: GanttStatus = {
   color: '#3b82f6' // blue-500
 }
 
-const STATUS_BLOCKED: GanttStatus = {
-  id: 'blocked',
-  name: 'Blocked',
-  color: '#ef4444' // red-500
-}
-
 /**
  * Transform instructors and availability to Gantt features
  */
@@ -181,8 +175,8 @@ export function InstructorGantt({
   className,
   zoom = 100,
   range = 'daily',
-  resizable = true,
-  draggable = true
+  resizable: _resizable = true,
+  draggable: _draggable = true
 }: InstructorGanttProps) {
   const features = transformToGanttFeatures(instructors, availability, bookings)
   
