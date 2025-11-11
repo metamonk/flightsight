@@ -176,7 +176,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                   </div>
 
                   {/* Weather Data */}
-                  {conflict.weather_data && (
+                  {conflict.weather_data && conflict.weather_data[0] && (
                     <div>
                       <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                         <Cloud className="h-4 w-4" />
@@ -189,7 +189,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                               <Cloud className="h-4 w-4 text-muted-foreground" />
                               <div>
                                 <p className="text-xs text-muted-foreground">Cloud Cover</p>
-                                <p className="text-sm font-medium">{conflict.weather_data.cloud_cover_percent}%</p>
+                                <p className="text-sm font-medium">{conflict.weather_data[0].cloud_cover_percent}%</p>
                               </div>
                             </div>
                           </CardContent>
@@ -200,7 +200,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                               <Wind className="h-4 w-4 text-muted-foreground" />
                               <div>
                                 <p className="text-xs text-muted-foreground">Wind</p>
-                                <p className="text-sm font-medium">{conflict.weather_data.wind_speed_knots} kts</p>
+                                <p className="text-sm font-medium">{conflict.weather_data[0].wind_speed_knots} kts</p>
                               </div>
                             </div>
                           </CardContent>
@@ -211,7 +211,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                               <Eye className="h-4 w-4 text-muted-foreground" />
                               <div>
                                 <p className="text-xs text-muted-foreground">Visibility</p>
-                                <p className="text-sm font-medium">{conflict.weather_data.visibility_miles} mi</p>
+                                <p className="text-sm font-medium">{conflict.weather_data[0].visibility_miles} mi</p>
                               </div>
                             </div>
                           </CardContent>
@@ -222,7 +222,7 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                               <Gauge className="h-4 w-4 text-muted-foreground" />
                               <div>
                                 <p className="text-xs text-muted-foreground">Ceiling</p>
-                                <p className="text-sm font-medium">{conflict.weather_data.ceiling_feet} ft</p>
+                                <p className="text-sm font-medium">{conflict.weather_data[0].ceiling_ft} ft</p>
                               </div>
                             </div>
                           </CardContent>
@@ -262,13 +262,19 @@ export function WeatherAlerts({ userId }: { userId: string }) {
                     <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4 animate-pulse" />
                       <span>AI is generating reschedule proposals...</span>
-                </div>
+                    </div>
                   )}
 
-                  {conflict.status === 'detected' && (
-                    <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 animate-pulse" />
-                      <span>Processing weather conflict...</span>
+                  {conflict.status === 'detected' && !hasProposals && (
+                    <div className="flex flex-col items-center justify-center gap-4 py-8">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4 animate-pulse" />
+                        <span>Processing weather conflict...</span>
+                      </div>
+                      <p className="text-xs text-center text-muted-foreground max-w-md">
+                        Our AI is analyzing weather patterns and generating optimal reschedule options for you.
+                        You'll be notified when proposals are ready (typically within 30 seconds).
+                      </p>
                     </div>
                   )}
                 </div>

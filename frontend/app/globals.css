@@ -329,19 +329,19 @@
 }
 
 .status-dot-active {
-  @apply status-dot animate-pulse bg-accent;
+  @apply h-2 w-2 rounded-full animate-pulse bg-accent;
 }
 
 .status-dot-inactive {
-  @apply status-dot bg-muted-foreground;
+  @apply h-2 w-2 rounded-full bg-muted-foreground;
 }
 
 .status-dot-error {
-  @apply status-dot animate-pulse bg-destructive;
+  @apply h-2 w-2 rounded-full animate-pulse bg-destructive;
 }
 
 .status-dot-warning {
-  @apply status-dot animate-pulse;
+  @apply h-2 w-2 rounded-full animate-pulse;
   background: oklch(0.6 0.25 30);
 }
 
@@ -526,4 +526,43 @@
 /* Prevent any child from breaking containment */
 .schedule-x-wrapper * {
   box-sizing: border-box !important;
+}
+
+/* ========================================
+   Dark Mode Text Visibility Fixes
+   ======================================== */
+
+/* Ensure all calendar text is visible in dark mode */
+.dark .sx-react-calendar-wrapper,
+.dark .sx-react-calendar-wrapper * {
+  color: oklch(var(--foreground));
+}
+
+/* Preserve event text colors */
+.dark .sx-react-calendar-wrapper .sx-event * {
+  color: inherit;
+}
+
+/* Gantt chart dark mode text fixes */
+.dark [class*="gantt"] {
+  color: oklch(var(--foreground));
+}
+
+.dark .instructor-gantt-wrapper {
+  color: oklch(var(--foreground));
+}
+
+/* Ensure Gantt sidebar and timeline text is visible */
+.dark [data-slot="gantt-sidebar"],
+.dark [data-slot="gantt-timeline"],
+.dark [data-slot="gantt-header"],
+.dark [data-slot="gantt-feature-row"] {
+  color: oklch(var(--foreground));
+}
+
+/* Gantt text elements */
+.dark .gantt-row-text,
+.dark .gantt-date-text,
+.dark .gantt-label {
+  color: oklch(var(--foreground)) !important;
 }

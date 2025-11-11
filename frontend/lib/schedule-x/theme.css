@@ -109,13 +109,33 @@
   padding: 0.5rem 0.75rem;
   border: none;
   background: transparent;
-  color: var(--sx-color-muted-foreground);
+  color: var(--sx-color-on-surface);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.sx-react-calendar-wrapper .sx-view-selection button:hover:not(.sx-active) {
+  background-color: oklch(var(--background));
+  color: var(--sx-color-on-background);
 }
 
 .sx-react-calendar-wrapper .sx-view-selection button.sx-active {
-  background-color: var(--sx-color-surface);
-  color: var(--sx-color-on-surface);
-  box-shadow: var(--shadow-sm);
+  background-color: oklch(var(--background));
+  color: var(--sx-color-on-background);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  font-weight: 600;
+}
+
+/* Enhanced contrast for dark mode */
+.dark .sx-react-calendar-wrapper .sx-view-selection button:hover:not(.sx-active) {
+  background-color: oklch(0.15 0.02 240);
+  color: oklch(var(--foreground));
+}
+
+.dark .sx-react-calendar-wrapper .sx-view-selection button.sx-active {
+  background-color: oklch(0.15 0.02 240);
+  color: oklch(var(--foreground));
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.2);
 }
 
 /* ========================================
@@ -137,7 +157,12 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--sx-color-muted-foreground);
+  color: var(--sx-color-on-surface);
+}
+
+.dark .sx-react-calendar-wrapper .sx-week-grid-day-header,
+.dark .sx-react-calendar-wrapper .sx-day-grid-day-header {
+  color: oklch(var(--foreground));
 }
 
 /* Today highlight */
@@ -151,18 +176,40 @@
 .sx-react-calendar-wrapper .sx-time-axis {
   background-color: var(--sx-color-surface);
   border-right: 1px solid var(--sx-color-border);
-  color: var(--sx-color-muted-foreground);
+  color: var(--sx-color-on-surface);
   font-size: 0.75rem;
   font-family: var(--font-mono);
+}
+
+.dark .sx-react-calendar-wrapper .sx-time-axis {
+  color: oklch(var(--foreground));
 }
 
 .sx-react-calendar-wrapper .sx-time-axis-hour {
   padding: 0.25rem 0.5rem;
 }
 
-/* Grid lines */
+/* Grid lines - simple light color that works in dark mode */
+/* Using !important to override default Schedule-X theme */
+
+/* Override the actual grid hour lines (the horizontal lines in week/day view) */
+.sx-react-calendar-wrapper .sx__week-grid__hour {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Override grid cells (if used elsewhere) */
 .sx-react-calendar-wrapper .sx-grid-cell {
-  border: 1px solid oklch(var(--border) / 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Override the time grid day borders (vertical lines) */
+.sx-react-calendar-wrapper .sx__time-grid-day {
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Calendar outer border */
+.sx-react-calendar-wrapper .sx__calendar {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 .sx-react-calendar-wrapper .sx-grid-cell:hover {
@@ -216,6 +263,10 @@
   font-weight: 600;
   color: var(--sx-color-on-surface);
   margin-bottom: 0.5rem;
+}
+
+.dark .sx-react-calendar-wrapper .sx-month-grid-day-date {
+  color: oklch(var(--foreground));
 }
 
 .sx-react-calendar-wrapper .sx-month-grid-day.sx-today .sx-month-grid-day-date {

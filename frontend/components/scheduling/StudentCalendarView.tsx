@@ -21,7 +21,7 @@ import {
   extractEventTimes,
   type BookingData,
 } from '@/lib/schedule-x/events'
-import { Button } from '@/components/ui/button'
+import { BookLessonButton } from '@/components/booking/BookLessonButton'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AlertCircle, Calendar as CalendarIcon } from 'lucide-react'
@@ -221,9 +221,7 @@ export function StudentCalendarView({
             <p className="text-sm text-muted-foreground mb-4">
               Click on the calendar to schedule your first lesson
             </p>
-            <Button onClick={() => router.push('/dashboard/student')}>
-              Book a Lesson
-            </Button>
+            <BookLessonButton />
           </div>
           
           {/* Still show the calendar for date selection */}

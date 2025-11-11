@@ -151,7 +151,7 @@ export function ScheduleXCalendarWrapper({
         eventsService.add(event)
       }
     })
-  }, [events, backgroundEvents, eventsService])
+  }, [events, backgroundEvents, eventsService]) // Added eventsService back - it's stable!
   
   return (
     <div 

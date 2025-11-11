@@ -91,6 +91,11 @@ export function useRealtimeSubscription(userId: string) {
       queryClient.invalidateQueries({ queryKey: ['proposals'] })
     }, 300)
 
+    const debouncedInvalidateNotifications = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', userId] })
+      queryClient.invalidateQueries({ queryKey: ['unread-count', userId] })
+    }, 300)
+
     // Create a channel for this user's data
     const channel = supabase
       .channel(`user-${userId}-updates`)
@@ -128,6 +133,63 @@ export function useRealtimeSubscription(userId: string) {
           debouncedInvalidateBookings()
           debouncedInvalidateConflicts()
           debouncedInvalidateProposals()
+        }
+      )
+
+      // Listen for NEW notifications for this user
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const notification = payload.new as any
+          console.log('🔔 New notification:', notification.type, notification.title)
+          
+          // Show toast notification
+          import('sonner').then(({ toast }) => {
+            switch (notification.type) {
+              case 'weather_conflict':
+                toast.error(notification.title, {
+                  description: notification.message,
+                  duration: 8000,
+                  icon: '⚠️',
+                })
+                break
+              case 'reschedule_proposal':
+                toast.info(notification.title, {
+                  description: notification.message,
+                  duration: 8000,
+                  icon: '🤖',
+                })
+                break
+              case 'reschedule_accepted':
+                toast.success(notification.title, {
+                  description: notification.message,
+                  duration: 6000,
+                  icon: '✅',
+                })
+                break
+              case 'booking_updated':
+                toast.info(notification.title, {
+                  description: notification.message,
+                  duration: 5000,
+                  icon: '🔄',
+                })
+                break
+              default:
+                toast(notification.title, {
+                  description: notification.message,
+                  duration: 5000,
+                })
+            }
+          })
+
+          // Invalidate queries
+          debouncedInvalidateNotifications()
         }
       )
 
@@ -169,7 +231,7 @@ export function useRealtimeSubscription(userId: string) {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [userId, queryClient, reconnect])
+  }, [userId, reconnect]) // Removed queryClient - it's stable and doesn't need to be in deps
 
   return { connectionStatus }
 }
@@ -237,6 +299,11 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
       queryClient.invalidateQueries({ queryKey: ['instructor-proposals', instructorId] })
     }, 300)
 
+    const debouncedInvalidateNotifications = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', instructorId] })
+      queryClient.invalidateQueries({ queryKey: ['unread-count', instructorId] })
+    }, 300)
+
     const channel = supabase
       .channel(`instructor-${instructorId}-updates`)
 
@@ -255,6 +322,63 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
           debouncedInvalidateBookings()
           debouncedInvalidateConflicts()
           debouncedInvalidateProposals()
+        }
+      )
+
+      // Listen for NEW notifications for this instructor
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${instructorId}`,
+        },
+        (payload) => {
+          const notification = payload.new as any
+          console.log('🔔 Instructor notification:', notification.type, notification.title)
+          
+          // Show toast notification
+          import('sonner').then(({ toast }) => {
+            switch (notification.type) {
+              case 'weather_conflict':
+                toast.error(notification.title, {
+                  description: notification.message,
+                  duration: 8000,
+                  icon: '⚠️',
+                })
+                break
+              case 'reschedule_proposal':
+                toast.info(notification.title, {
+                  description: notification.message,
+                  duration: 8000,
+                  icon: '🤖',
+                })
+                break
+              case 'reschedule_accepted':
+                toast.success(notification.title, {
+                  description: notification.message,
+                  duration: 6000,
+                  icon: '✅',
+                })
+                break
+              case 'booking_updated':
+                toast.info(notification.title, {
+                  description: notification.message,
+                  duration: 5000,
+                  icon: '🔄',
+                })
+                break
+              default:
+                toast(notification.title, {
+                  description: notification.message,
+                  duration: 5000,
+                })
+            }
+          })
+
+          // Invalidate queries
+          debouncedInvalidateNotifications()
         }
       )
 
@@ -295,7 +419,7 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [instructorId, queryClient, reconnect])
+  }, [instructorId, reconnect]) // Removed queryClient - it's stable and doesn't need to be in deps
 
   return { connectionStatus }
 }
@@ -313,55 +437,11 @@ export function useInstructorRealtimeSubscription(instructorId: string) {
  */
 export function useAdminRealtimeSubscription() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const maxReconnectAttempts = 5
   const reconnectDelayRef = useRef(1000)
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('disconnected')
-
-  // Debounced query invalidation functions
-  const debouncedInvalidateAdminBookings = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bookings'] })
-    }, 500), // Slightly longer delay for admin views
-    [queryClient]
-  )
-
-  const debouncedInvalidateAdminConflicts = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['admin-weather-conflicts'] })
-    }, 500),
-    [queryClient]
-  )
-
-  const debouncedInvalidateAdminProposals = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['admin-proposals'] })
-    }, 500),
-    [queryClient]
-  )
-
-  const debouncedInvalidateAdminUsers = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    }, 1000), // Even longer for user changes
-    [queryClient]
-  )
-
-  const debouncedInvalidateAirports = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['airports'] })
-    }, 500),
-    [queryClient]
-  )
-
-  const debouncedInvalidateLessonTypes = useCallback(
-    debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ['lessonTypes'] })
-    }, 500),
-    [queryClient]
-  )
 
   // Reconnection logic with exponential backoff
   const reconnect = useCallback(() => {
@@ -389,6 +469,33 @@ export function useAdminRealtimeSubscription() {
 
   useEffect(() => {
     console.log('🔌 Setting up admin realtime subscriptions (system-wide)')
+
+    const supabase = createClient()
+
+    // Create debounced invalidation functions inside the effect to avoid dependency issues
+    const debouncedInvalidateAdminBookings = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['admin-bookings'] })
+    }, 500)
+
+    const debouncedInvalidateAdminConflicts = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['admin-weather-conflicts'] })
+    }, 500)
+
+    const debouncedInvalidateAdminProposals = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['admin-proposals'] })
+    }, 500)
+
+    const debouncedInvalidateAdminUsers = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    }, 1000)
+
+    const debouncedInvalidateAirports = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['airports'] })
+    }, 500)
+
+    const debouncedInvalidateLessonTypes = debounce(() => {
+      queryClient.invalidateQueries({ queryKey: ['lessonTypes'] })
+    }, 500)
 
     const channel = supabase
       .channel('admin-system-updates')
@@ -510,7 +617,7 @@ export function useAdminRealtimeSubscription() {
       reconnectDelayRef.current = 1000
       setConnectionStatus('disconnected')
     }
-  }, [queryClient, supabase, debouncedInvalidateAdminBookings, debouncedInvalidateAdminConflicts, debouncedInvalidateAdminProposals, debouncedInvalidateAdminUsers, debouncedInvalidateAirports, debouncedInvalidateLessonTypes, reconnect])
+  }, [reconnect]) // Removed queryClient - it's stable and doesn't need to be in deps
 
   return { connectionStatus }
 }

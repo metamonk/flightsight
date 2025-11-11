@@ -5,6 +5,7 @@
  */
 
 export { ScheduleXCalendarWrapper as ScheduleXCalendar } from './ScheduleXCalendar'
+export { LazyScheduleXCalendarWrapper as LazyScheduleXCalendar } from './LazyScheduleXCalendar'
 export { InstructorGantt } from './InstructorGantt'
 export { InstructorGanttView } from './InstructorGanttView'
 export { StudentCalendarView } from './StudentCalendarView'
@@ -22,4 +23,5 @@ export type {
 export type { InstructorGanttViewProps } from './InstructorGanttView'
 export type { StudentCalendarViewProps } from './StudentCalendarView'
 export type { InstructorCalendarViewProps } from './InstructorCalendarView'
+
 

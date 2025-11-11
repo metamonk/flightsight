@@ -1,6 +1,9 @@
 'use client'
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { memo } from 'react'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
 export interface InstructorActivityData {
   name: string
@@ -24,14 +27,52 @@ const CHART_COLORS = [
   'hsl(var(--secondary))', // secondary
 ]
 
+// Lazy load Recharts components for better performance
+const LazyPieChart = dynamic(
+  () => import('recharts').then((mod) => mod.PieChart),
+  {
+    loading: () => <Skeleton className="w-full h-[300px] rounded-full" />,
+    ssr: false,
+  }
+)
+
+const LazyPie = dynamic(
+  () => import('recharts').then((mod) => mod.Pie),
+  { ssr: false }
+)
+
+const LazyCell = dynamic(
+  () => import('recharts').then((mod) => mod.Cell),
+  { ssr: false }
+)
+
+const LazyTooltip = dynamic(
+  () => import('recharts').then((mod) => mod.Tooltip),
+  { ssr: false }
+)
+
+const LazyLegend = dynamic(
+  () => import('recharts').then((mod) => mod.Legend),
+  { ssr: false }
+)
+
+const LazyResponsiveContainer = dynamic(
+  () => import('recharts').then((mod) => mod.ResponsiveContainer),
+  { ssr: false }
+)
+
 /**
  * Instructor Activity Pie Chart
  * 
  * Visualizes booking distribution across instructors
  * Helps identify workload balance
+ * Uses Recharts with lazy loading for optimal performance
  * Refactored to use theme-aware colors from CSS variables
+ * Memoized to prevent unnecessary re-renders
  */
-export function InstructorActivityChart({ data }: InstructorActivityChartProps) {
+export const InstructorActivityChart = memo(function InstructorActivityChart({ 
+  data 
+}: InstructorActivityChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-muted-foreground">
@@ -41,9 +82,9 @@ export function InstructorActivityChart({ data }: InstructorActivityChartProps) 
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie
+    <LazyResponsiveContainer width="100%" height={300}>
+      <LazyPieChart>
+        <LazyPie
           data={data}
           cx="50%"
           cy="50%"
@@ -54,10 +95,10 @@ export function InstructorActivityChart({ data }: InstructorActivityChartProps) 
           dataKey="value"
         >
           {data.map((_entry, index) => (
-            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+            <LazyCell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
           ))}
-        </Pie>
-        <Tooltip 
+        </LazyPie>
+        <LazyTooltip 
           contentStyle={{
             backgroundColor: 'hsl(var(--card))',
             border: '1px solid hsl(var(--border))',
@@ -66,13 +107,13 @@ export function InstructorActivityChart({ data }: InstructorActivityChartProps) 
             color: 'hsl(var(--card-foreground))'
           }}
         />
-        <Legend 
+        <LazyLegend 
           wrapperStyle={{ fontSize: '12px', color: 'hsl(var(--foreground))' }}
           layout="horizontal"
           verticalAlign="bottom"
         />
-      </PieChart>
-    </ResponsiveContainer>
+      </LazyPieChart>
+    </LazyResponsiveContainer>
   )
-}
+})
 

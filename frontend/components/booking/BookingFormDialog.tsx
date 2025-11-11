@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { BookingFormWizard } from './BookingFormWizard'
 
@@ -15,6 +15,14 @@ import { BookingFormWizard } from './BookingFormWizard'
  */
 export function BookingFormDialog({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    console.log('🔍 BookingFormDialog mounted')
+  }, [])
+
+  useEffect(() => {
+    console.log('🔍 Dialog open state changed:', open)
+  }, [open])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

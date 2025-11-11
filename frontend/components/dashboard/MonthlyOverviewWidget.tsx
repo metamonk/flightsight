@@ -202,11 +202,9 @@ export function MonthlyOverviewWidget({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle asChild>
-              <h2 className="flex items-center gap-2 text-base">
-                <CalendarIcon className="h-4 w-4" aria-hidden="true" />
-                Monthly Overview
-              </h2>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CalendarIcon className="h-4 w-4" aria-hidden="true" />
+              Monthly Overview
             </CardTitle>
             <CardDescription className="text-xs">
               {stats.total} booking{stats.total !== 1 ? 's' : ''} this month

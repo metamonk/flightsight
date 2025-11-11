@@ -48,7 +48,7 @@ export interface WeatherConflictData {
   booking_id: string
   detected_at: string
   status: 'detected' | 'proposals_ready' | 'resolved'
-  weather_reasons: string[]
+  conflict_reasons: string[]
   booking: BookingData
 }
 
@@ -140,7 +140,7 @@ export function transformConflictToBackground(
   // Build description with weather reasons
   const description = [
     'Weather Conflict',
-    ...conflict.weather_reasons
+    ...conflict.conflict_reasons
   ].join('\n')
   
   return {
@@ -158,7 +158,7 @@ export function transformConflictToBackground(
       isBackground: true,
       conflictId: conflict.id,
       bookingId: conflict.booking_id,
-      weatherReasons: conflict.weather_reasons
+      weatherReasons: conflict.conflict_reasons
     }
   }
 }

@@ -4,7 +4,7 @@ import { useBookings, useWeatherConflicts, useAcceptProposal, useRejectProposal 
 import { formatLocalTime } from '@/lib/utils/date'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { BookLessonButton } from './BookLessonButton'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CloudRain, AlertTriangle } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -80,9 +80,9 @@ export function BookingsList({ userId }: { userId: string }) {
       <Card className="text-center">
         <CardContent>
           <p className="text-muted-foreground">No upcoming flights scheduled</p>
-          <Button className="mt-4">
-            Schedule a Lesson
-          </Button>
+          <div className="mt-4">
+            <BookLessonButton />
+          </div>
         </CardContent>
       </Card>
     )

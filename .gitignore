@@ -20,6 +20,9 @@ node_modules/
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*~
+.history/
 
 # OS specific
 .DS_Store
@@ -38,6 +41,21 @@ supabase/config.toml
 coverage/
 *.test.js.snap
 .vitest/
+
+# TypeScript
+*.tsbuildinfo
+
+# Lock files from other package managers (using pnpm)
+package-lock.json
+yarn.lock
+
+# Temporary SQL scripts
+*-demo*.sql
+*-test*.sql
+*test*.sql
+clear-*.sql
+fix-*.sql
+demo-*.sql
 
 # Vercel
 .vercel

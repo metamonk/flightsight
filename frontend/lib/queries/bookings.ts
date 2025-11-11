@@ -11,6 +11,10 @@ export function useBookings(userId: string) {
   return useQuery({
     queryKey: ['bookings', userId],
     queryFn: async () => {
+      if (!userId) {
+        return []
+      }
+      
       const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -26,6 +30,7 @@ export function useBookings(userId: string) {
       if (error) throw error
       return data
     },
+    enabled: !!userId, // Only run if userId is provided
     staleTime: 30 * 1000, // 30 seconds
   })
 }
@@ -115,26 +120,71 @@ export function useAcceptProposal() {
 
   return useMutation({
     mutationFn: async (proposalId: string) => {
-      const { data, error } = await supabase
+      // First, get the proposal details including conflict_id and booking_id
+      const { data: proposal, error: fetchError } = await supabase
+        .from('reschedule_proposals')
+        .select('proposed_start, proposed_end, proposed_instructor_id, proposed_aircraft_id, conflict_id')
+        .eq('id', proposalId)
+        .single()
+
+      if (fetchError || !proposal) throw fetchError || new Error('Proposal not found')
+
+      // Get the booking_id from the weather_conflict
+      const { data: conflict, error: conflictFetchError } = await supabase
+        .from('weather_conflicts')
+        .select('booking_id')
+        .eq('id', proposal.conflict_id)
+        .single()
+
+      if (conflictFetchError || !conflict) throw conflictFetchError || new Error('Conflict not found')
+
+      // Update the proposal with student acceptance
+      const { error: proposalError } = await supabase
         .from('reschedule_proposals')
         .update({ 
           student_response: 'accepted',
-          student_responded_at: new Date().toISOString()
+          student_responded_at: new Date().toISOString(),
+          accepted_at: new Date().toISOString()
         })
         .eq('id', proposalId)
-        .select()
-        .single()
 
-      if (error) throw error
-      return data
+      if (proposalError) throw proposalError
+
+      // Update the booking with new times and status
+      const { error: bookingError } = await supabase
+        .from('bookings')
+        .update({ 
+          scheduled_start: proposal.proposed_start,
+          scheduled_end: proposal.proposed_end,
+          instructor_id: proposal.proposed_instructor_id || undefined,
+          aircraft_id: proposal.proposed_aircraft_id || undefined,
+          status: 'scheduled' // Change from weather_hold to scheduled
+        })
+        .eq('id', conflict.booking_id)
+
+      if (bookingError) throw bookingError
+
+      // Resolve the weather conflict
+      const { error: conflictError } = await supabase
+        .from('weather_conflicts')
+        .update({
+          status: 'resolved',
+          resolved_at: new Date().toISOString(),
+          resolution_method: 'rescheduled'
+        })
+        .eq('id', proposal.conflict_id)
+
+      if (conflictError) throw conflictError
+
+      return { proposalId, bookingId: conflict.booking_id }
     },
     onMutate: async (proposalId) => {
       // Show loading toast
-      toast.loading('Accepting proposal...', { id: proposalId })
+      toast.loading('Accepting proposal and rescheduling...', { id: proposalId })
     },
-    onSuccess: (_data, proposalId) => {
+    onSuccess: (data, proposalId) => {
       // Dismiss loading toast and show success
-      toast.success('✅ Proposal accepted! Your instructor will be notified.', { 
+      toast.success('✅ Proposal accepted! Your lesson has been rescheduled.', { 
         id: proposalId,
         duration: 4000,
       })
@@ -143,6 +193,7 @@ export function useAcceptProposal() {
       queryClient.invalidateQueries({ queryKey: ['proposals'] })
       queryClient.invalidateQueries({ queryKey: ['weather-conflicts'] })
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['student-bookings'] })
     },
     onError: (error: Error, proposalId) => {
       // Dismiss loading toast and show error
@@ -204,6 +255,10 @@ export function useInstructorBookings(instructorId: string) {
   return useQuery({
     queryKey: ['instructor-bookings', instructorId],
     queryFn: async () => {
+      if (!instructorId) {
+        return []
+      }
+      
       const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -219,6 +274,7 @@ export function useInstructorBookings(instructorId: string) {
       if (error) throw error
       return data
     },
+    enabled: !!instructorId, // Only run if instructorId is provided
     staleTime: 30 * 1000, // 30 seconds
   })
 }
@@ -351,6 +407,8 @@ export function useApproveProposal() {
       queryClient.invalidateQueries({ queryKey: ['instructor-proposals'] })
       queryClient.invalidateQueries({ queryKey: ['instructor-bookings'] })
       queryClient.invalidateQueries({ queryKey: ['weather-conflicts'] })
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      queryClient.invalidateQueries({ queryKey: ['student-bookings'] })
     },
     onError: (error: Error, { proposalId }) => {
       toast.error(`Failed to approve proposal: ${error.message}`, { 

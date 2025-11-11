@@ -1,6 +1,9 @@
 'use client'
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { memo } from 'react'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 export interface ConflictsChartData {
   period: string
@@ -13,14 +16,60 @@ interface ConflictsChartProps {
   data: ConflictsChartData[]
 }
 
+// Lazy load Recharts components for better performance
+const LazyBarChart = dynamic(
+  () => import('recharts').then((mod) => mod.BarChart),
+  {
+    loading: () => <Skeleton className="w-full h-[300px]" />,
+    ssr: false,
+  }
+)
+
+const LazyBar = dynamic(
+  () => import('recharts').then((mod) => mod.Bar),
+  { ssr: false }
+)
+
+const LazyXAxis = dynamic(
+  () => import('recharts').then((mod) => mod.XAxis),
+  { ssr: false }
+)
+
+const LazyYAxis = dynamic(
+  () => import('recharts').then((mod) => mod.YAxis),
+  { ssr: false }
+)
+
+const LazyCartesianGrid = dynamic(
+  () => import('recharts').then((mod) => mod.CartesianGrid),
+  { ssr: false }
+)
+
+const LazyTooltip = dynamic(
+  () => import('recharts').then((mod) => mod.Tooltip),
+  { ssr: false }
+)
+
+const LazyLegend = dynamic(
+  () => import('recharts').then((mod) => mod.Legend),
+  { ssr: false }
+)
+
+const LazyResponsiveContainer = dynamic(
+  () => import('recharts').then((mod) => mod.ResponsiveContainer),
+  { ssr: false }
+)
+
 /**
  * Weather Conflicts Chart
  * 
  * Displays weather conflict statistics over time periods
  * Shows resolved vs pending conflicts for easy tracking
+ * Uses Recharts with lazy loading for optimal performance
  * Refactored to use theme-aware colors from CSS variables
+ * Memoized to prevent unnecessary re-renders
  */
-export function ConflictsChart({ data }: ConflictsChartProps) {
+export const ConflictsChart = memo(function ConflictsChart({ data }: ConflictsChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64 text-muted-foreground">
@@ -30,19 +79,19 @@ export function ConflictsChart({ data }: ConflictsChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-        <XAxis 
+    <LazyResponsiveContainer width="100%" height={300}>
+      <LazyBarChart data={data}>
+        <LazyCartesianGrid strokeDasharray="3 3" className="stroke-border" />
+        <LazyXAxis 
           dataKey="period" 
           className="text-xs fill-muted-foreground"
           tick={{ fill: 'hsl(var(--muted-foreground))' }}
         />
-        <YAxis 
+        <LazyYAxis 
           className="text-xs fill-muted-foreground"
           tick={{ fill: 'hsl(var(--muted-foreground))' }}
         />
-        <Tooltip 
+        <LazyTooltip 
           contentStyle={{
             backgroundColor: 'hsl(var(--card))',
             border: '1px solid hsl(var(--border))',
@@ -51,23 +100,23 @@ export function ConflictsChart({ data }: ConflictsChartProps) {
             color: 'hsl(var(--card-foreground))'
           }}
         />
-        <Legend 
+        <LazyLegend 
           wrapperStyle={{ fontSize: '12px', color: 'hsl(var(--foreground))' }}
         />
-        <Bar 
+        <LazyBar 
           dataKey="resolved" 
           fill="hsl(var(--chart-1))" 
           radius={[4, 4, 0, 0]}
           name="Resolved"
         />
-        <Bar 
+        <LazyBar 
           dataKey="pending" 
           fill="hsl(var(--chart-2))" 
           radius={[4, 4, 0, 0]}
           name="Pending"
         />
-      </BarChart>
-    </ResponsiveContainer>
+      </LazyBarChart>
+    </LazyResponsiveContainer>
   )
-}
+})
 

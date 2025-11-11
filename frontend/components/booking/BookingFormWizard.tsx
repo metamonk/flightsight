@@ -15,7 +15,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -234,10 +234,12 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
       resetForm()
     }
   }, [open, resetForm])
-  
+
+  // Don't render anything if not open
+  if (!open) return null
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border-primary/30">
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border-primary/30">
         {/* HUD Grid Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(100,150,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(100,150,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
         
@@ -295,7 +297,7 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
                 >
                   <MiniCalendarNavigation direction="prev" />
                   <MiniCalendarDays className="flex-1 justify-between">
-                    {(date) => <MiniCalendarDay date={date} />}
+                    {(date) => <MiniCalendarDay key={date.toISOString()} date={date} />}
                   </MiniCalendarDays>
                   <MiniCalendarNavigation direction="next" />
                 </MiniCalendar>
@@ -686,7 +688,6 @@ export function BookingFormWizard({ open, onOpenChange }: BookingFormWizardProps
           </div>
         </div>
       </DialogContent>
-    </Dialog>
   )
 }
 

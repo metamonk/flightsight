@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { InstructorDashboardClient } from './InstructorDashboardClient'
@@ -7,8 +6,7 @@ import { InstructorBookingsList } from '@/components/booking/InstructorBookingsL
 import { InstructorProposalsList } from '@/components/proposals/InstructorProposalsList'
 import { InstructorGanttView } from '@/components/scheduling/InstructorGanttView'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
-import { RoleBadge } from '@/components/shared/RoleBadge'
-import { Button } from '@/components/ui/button'
+import { DashboardNav } from '@/components/navigation/DashboardNav'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 /**
@@ -47,46 +45,13 @@ export default async function InstructorDashboard() {
 
   return (
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
-                  👨‍✈️ Instructor Dashboard
-                </h1>
-                <RoleBadge role="instructor" size="sm" />
-              </div>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="default" asChild>
-                <Link href="/dashboard/instructor/availability">
-                  ⏰ Manage Availability
-                </Link>
-              </Button>
-              <Button variant="outline" size="default" asChild>
-                <Link href="/dashboard/instructor/calendar">
-                  📅 Calendar View
-                </Link>
-              </Button>
-              <Button variant="outline" size="default" asChild>
-                <Link href="/profile">
-                  ⚙️ Settings
-                </Link>
-              </Button>
-              <form>
-                <Button
-                  formAction={logout}
-                  variant="destructive"
-                  size="default"
-                >
-                  Sign Out
-                </Button>
-              </form>
-            </div>
-          </div>
-        </header>
+        <DashboardNav
+          userId={user.id}
+          userEmail={user.email!}
+          role="instructor"
+          currentPage="dashboard"
+          onSignOut={logout}
+        />
 
       {/* Main Content - Wrapped in InstructorRealtimeProvider via InstructorDashboardClient */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -32,7 +32,7 @@ const getDefaultDateRange = () => ({
 })
 
 export function AdminDashboardClient({}: AdminDashboardClientProps) {
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<FilterState>(() => ({
     dateRange: getDefaultDateRange(),
     status: {
       confirmed: true,
@@ -41,11 +41,16 @@ export function AdminDashboardClient({}: AdminDashboardClientProps) {
       rescheduling: true,
     },
     searchQuery: '',
-  })
+  }))
 
   const { data: bookings, isLoading: bookingsLoading } = useAdminBookings()
 
   const filteredBookings = bookings ? applyFilters(bookings, filters) : []
+  
+  // Memoized callback to prevent infinite re-renders
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters)
+  }
 
   return (
     <AdminRealtimeProvider>
@@ -76,7 +81,7 @@ export function AdminDashboardClient({}: AdminDashboardClientProps) {
               <div className="lg:col-span-1">
                 <div className="sticky top-24">
                   <DashboardFilters
-                    onFilterChange={setFilters}
+                    onFilterChange={handleFilterChange}
                     initialFilters={filters}
                   />
                 </div>

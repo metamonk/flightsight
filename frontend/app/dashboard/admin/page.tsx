@@ -1,10 +1,9 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { AdminDashboardClient } from './AdminDashboardClient'
-import { RoleBadge } from '@/components/shared/RoleBadge'
-import { Button } from '@/components/ui/button'
+import { DashboardNav } from '@/components/navigation/DashboardNav'
+import { AdminWeatherTrigger } from '@/components/admin/AdminWeatherTrigger'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 /**
@@ -54,51 +53,13 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
-                🎯 Admin Dashboard
-              </h1>
-              <RoleBadge role="admin" size="sm" />
-            </div>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="default" asChild>
-              <Link href="/dashboard/admin/users">
-                👥 Manage Users
-              </Link>
-            </Button>
-            <Button variant="outline" size="default" asChild>
-              <Link href="/dashboard/admin/aircraft">
-                ✈️ Manage Aircraft
-              </Link>
-            </Button>
-            <Button variant="outline" size="default" asChild>
-              <Link href="/dashboard/admin/lookups">
-                🗂️ Airports & Lessons
-              </Link>
-            </Button>
-            <Button variant="outline" size="default" asChild>
-              <Link href="/profile">
-                ⚙️ Settings
-              </Link>
-            </Button>
-            <form>
-              <Button
-                formAction={logout}
-                variant="destructive"
-                size="default"
-              >
-                Sign Out
-              </Button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <DashboardNav
+        userId={user.id}
+        userEmail={user.email!}
+        role="admin"
+        currentPage="dashboard"
+        onSignOut={logout}
+      />
 
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -117,6 +78,9 @@ export default async function AdminDashboard() {
         {/* Client-side Dashboard Content */}
         <AdminDashboardClient />
       </main>
+      
+      {/* Admin Trigger - Hidden, press Ctrl+Shift+W */}
+      <AdminWeatherTrigger />
     </div>
   )
 }

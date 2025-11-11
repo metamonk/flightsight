@@ -53,8 +53,8 @@ interface BookingDetailClientProps {
 export default function BookingDetailClient({ 
   booking, 
   userId, 
-  userRole,
-  userName 
+  userRole: _userRole, // Reserved for future role-based logic
+  userName: _userName // Reserved for future use
 }: BookingDetailClientProps) {
   const router = useRouter()
   const [isConfirming, setIsConfirming] = useState(false)

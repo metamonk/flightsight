@@ -1,13 +1,10 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { logout } from '@/app/auth/actions'
 import { StudentDashboardClient, StudentBookingsView } from './StudentDashboardClient'
-import { BookingFormDialog } from '@/components/booking/BookingFormDialog'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import { MonthlyOverview, InstructorAvatarGroup } from '@/components/dashboard'
-import { RoleBadge } from '@/components/shared/RoleBadge'
-import { Button } from '@/components/ui/button'
+import { DashboardNav } from '@/components/navigation/DashboardNav'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 /**
@@ -52,41 +49,13 @@ export default async function StudentDashboard() {
 
   return (
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border sticky top-0 z-10 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-card-foreground flex items-center gap-2">
-                  ✈️ Student Dashboard
-                </h1>
-                <RoleBadge role={role as 'student' | 'instructor' | 'admin'} size="sm" />
-              </div>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <BookingFormDialog>
-                <Button variant="default" size="default">
-                  ✈️ Book a Lesson
-                </Button>
-              </BookingFormDialog>
-              <Button variant="outline" size="default" asChild>
-                <Link href="/profile">
-                  ⚙️ Settings
-                </Link>
-              </Button>
-              <form>
-                <Button
-                  formAction={logout}
-                  variant="destructive"
-                  size="default"
-                >
-                  Sign Out
-                </Button>
-              </form>
-            </div>
-          </div>
-        </header>
+        <DashboardNav
+          userId={user.id}
+          userEmail={user.email!}
+          role="student"
+          currentPage="dashboard"
+          onSignOut={logout}
+        />
 
       {/* Main Content - Wrapped in RealtimeProvider via StudentDashboardClient */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

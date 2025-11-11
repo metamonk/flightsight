@@ -70,6 +70,12 @@ export interface InstructorGanttProps {
   
   /** View range */
   range?: 'daily' | 'monthly' | 'quarterly'
+  
+  /** Enable resizing */
+  resizable?: boolean
+  
+  /** Enable dragging */
+  draggable?: boolean
 }
 
 // Status definitions for availability types
@@ -174,7 +180,9 @@ export function InstructorGantt({
   onSelectItem,
   className,
   zoom = 100,
-  range = 'daily'
+  range = 'daily',
+  resizable = true,
+  draggable = true
 }: InstructorGanttProps) {
   const features = transformToGanttFeatures(instructors, availability, bookings)
   
