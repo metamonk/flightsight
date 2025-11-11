@@ -40,7 +40,25 @@ export default async function BookingDetailPage({
   const { data: booking, error } = await supabase
     .from('bookings')
     .select(`
-      *,
+      id,
+      student_id,
+      instructor_id,
+      aircraft_id,
+      status,
+      scheduled_start,
+      scheduled_end,
+      actual_start,
+      actual_end,
+      departure_airport_id,
+      destination_airport_id,
+      lesson_type_id,
+      notes,
+      hobbs_start,
+      hobbs_end,
+      flight_time,
+      ground_time,
+      created_at,
+      updated_at,
       student:student_id (
         id,
         full_name,
