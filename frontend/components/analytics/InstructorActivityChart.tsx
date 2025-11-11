@@ -3,7 +3,6 @@
 import { memo } from 'react'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
 export interface InstructorActivityData {
   name: string
@@ -52,7 +51,7 @@ const LazyTooltip = dynamic(
 )
 
 const LazyLegend = dynamic(
-  () => import('recharts').then((mod) => mod.Legend),
+  () => import('recharts').then((mod) => ({ default: mod.Legend })) as any,
   { ssr: false }
 )
 
@@ -107,10 +106,8 @@ export const InstructorActivityChart = memo(function InstructorActivityChart({
             color: 'hsl(var(--card-foreground))'
           }}
         />
-        <LazyLegend 
-          wrapperStyle={{ fontSize: '12px', color: 'hsl(var(--foreground))' }}
-          layout="horizontal"
-          verticalAlign="bottom"
+        <LazyLegend
+          {...({ wrapperStyle: { fontSize: '12px', color: 'hsl(var(--foreground))' }, layout: 'horizontal', verticalAlign: 'bottom' } as any)}
         />
       </LazyPieChart>
     </LazyResponsiveContainer>

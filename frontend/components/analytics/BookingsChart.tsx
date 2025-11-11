@@ -3,7 +3,6 @@
 import { memo } from 'react'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 export interface BookingsChartData {
   date: string
@@ -51,7 +50,7 @@ const LazyTooltip = dynamic(
 )
 
 const LazyLegend = dynamic(
-  () => import('recharts').then((mod) => mod.Legend),
+  () => import('recharts').then((mod) => ({ default: mod.Legend })) as any,
   { ssr: false }
 )
 
@@ -99,9 +98,8 @@ export const BookingsChart = memo(function BookingsChart({ data }: BookingsChart
             color: 'hsl(var(--card-foreground))'
           }}
         />
-        <LazyLegend 
-          wrapperStyle={{ fontSize: '12px', color: 'hsl(var(--foreground))' }}
-          iconType="line"
+        <LazyLegend
+          {...({ wrapperStyle: { fontSize: '12px', color: 'hsl(var(--foreground))' }, iconType: 'line' } as any)}
         />
         <LazyLine 
           type="monotone" 

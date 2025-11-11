@@ -3,7 +3,6 @@
 import { memo } from 'react'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 export interface ConflictsChartData {
   period: string
@@ -51,7 +50,7 @@ const LazyTooltip = dynamic(
 )
 
 const LazyLegend = dynamic(
-  () => import('recharts').then((mod) => mod.Legend),
+  () => import('recharts').then((mod) => ({ default: mod.Legend })) as any,
   { ssr: false }
 )
 
@@ -100,8 +99,8 @@ export const ConflictsChart = memo(function ConflictsChart({ data }: ConflictsCh
             color: 'hsl(var(--card-foreground))'
           }}
         />
-        <LazyLegend 
-          wrapperStyle={{ fontSize: '12px', color: 'hsl(var(--foreground))' }}
+        <LazyLegend
+          {...({ wrapperStyle: { fontSize: '12px', color: 'hsl(var(--foreground))' } } as any)}
         />
         <LazyBar 
           dataKey="resolved" 
