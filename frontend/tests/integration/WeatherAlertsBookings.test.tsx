@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { render } from '@/tests/helpers/test-utils'
 import { mockUsers, mockBookings, mockWeatherConflicts } from '@/tests/helpers/mockData'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
@@ -42,8 +41,6 @@ vi.mock('@/lib/queries/bookings', async () => {
 })
 
 describe('Weather Alerts and Bookings Integration', () => {
-  const user = userEvent.setup()
-
   beforeEach(() => {
     vi.clearAllMocks()
   })

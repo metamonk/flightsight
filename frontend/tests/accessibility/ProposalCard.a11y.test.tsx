@@ -30,30 +30,30 @@ describe('ProposalCard - Accessibility', () => {
   }
 
   it('should have no accessibility violations', async () => {
-    const { container } = render(<ProposalCard proposal={mockProposal as any} />)
+    const { container } = render(<ProposalCard proposal={mockProposal as any} rank={0} variant="student" />)
     const results = await axe(container)
     expect(results).toHaveNoViolations()
   })
 
   it('should have accessible button labels', async () => {
-    const { getByRole } = render(<ProposalCard proposal={mockProposal as any} />)
-    
+    const { getByRole } = render(<ProposalCard proposal={mockProposal as any} rank={0} variant="student" />)
+
     const acceptButton = getByRole('button', { name: /approve/i })
     const declineButton = getByRole('button', { name: /decline/i })
-    
+
     expect(acceptButton).toBeInTheDocument()
     expect(declineButton).toBeInTheDocument()
   })
 
   it('should have proper heading structure', async () => {
-    const { container } = render(<ProposalCard proposal={mockProposal as any} />)
-    
+    const { container } = render(<ProposalCard proposal={mockProposal as any} rank={0} variant="student" />)
+
     const headings = container.querySelectorAll('h1, h2, h3, h4, h5, h6')
     expect(headings.length).toBeGreaterThan(0)
   })
 
   it('should have sufficient color contrast for status badges', async () => {
-    const { container } = render(<ProposalCard proposal={mockProposal as any} />)
+    const { container } = render(<ProposalCard proposal={mockProposal as any} rank={0} variant="student" />)
     const results = await axe(container, {
       rules: {
         'color-contrast': { enabled: true },
@@ -63,11 +63,11 @@ describe('ProposalCard - Accessibility', () => {
   })
 
   it('should be keyboard navigable', async () => {
-    const { getByRole } = render(<ProposalCard proposal={mockProposal as any} />)
-    
+    const { getByRole } = render(<ProposalCard proposal={mockProposal as any} rank={0} variant="student" />)
+
     const acceptButton = getByRole('button', { name: /approve/i })
     const declineButton = getByRole('button', { name: /decline/i })
-    
+
     // Check that buttons are focusable
     expect(acceptButton).not.toHaveAttribute('tabindex', '-1')
     expect(declineButton).not.toHaveAttribute('tabindex', '-1')

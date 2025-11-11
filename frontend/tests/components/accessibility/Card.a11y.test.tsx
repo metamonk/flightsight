@@ -51,18 +51,18 @@ describe('Card Accessibility', () => {
 
   it('should support semantic article structure', async () => {
     const { container } = render(
-      <Card asChild>
-        <article>
+      <article>
+        <Card>
           <CardHeader>
             <CardTitle>Article Title</CardTitle>
           </CardHeader>
           <CardContent>
             <p>Article content</p>
           </CardContent>
-        </article>
-      </Card>
+        </Card>
+      </article>
     )
-    
+
     await testAccessibility(container)
   })
 

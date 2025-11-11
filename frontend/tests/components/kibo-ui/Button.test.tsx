@@ -140,7 +140,7 @@ describe('Button Component', () => {
     })
 
     it('should have group class on button with glow', () => {
-      const { container } = render(<Button withGlow>Group Button</Button>)
+      render(<Button withGlow>Group Button</Button>)
       const button = screen.getByRole('button')
       expect(button).toHaveClass('group')
       expect(button).toHaveClass('relative')
@@ -178,7 +178,7 @@ describe('Button Component', () => {
 
   describe('ButtonIcon Component', () => {
     it('should render with icon size by default', () => {
-      const { container } = render(
+      render(
         <ButtonIcon aria-label="Close">×</ButtonIcon>
       )
       expect(screen.getByRole('button')).toBeInTheDocument()
@@ -245,7 +245,7 @@ describe('Button Component', () => {
     })
 
     it('should apply custom className', () => {
-      const { container } = render(
+      render(
         <ButtonGroup className="custom-group">
           <Button>One</Button>
         </ButtonGroup>

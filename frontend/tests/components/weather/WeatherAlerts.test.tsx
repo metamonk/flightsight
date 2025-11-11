@@ -4,7 +4,7 @@
  * Tests the weather conflict alert display and proposal integration.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts'
 import * as bookingQueries from '@/lib/queries/bookings'

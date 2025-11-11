@@ -23,7 +23,7 @@ export const defaultAxeConfig: JestAxeConfigureOptions = {
  * @returns Promise resolving to axe results
  */
 export async function testAccessibility(
-  container: Element,
+  container: HTMLElement,
   config: JestAxeConfigureOptions = defaultAxeConfig
 ) {
   const results = await axe(container, config)

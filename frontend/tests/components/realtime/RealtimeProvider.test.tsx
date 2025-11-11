@@ -144,7 +144,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should update connection status to connected on SUBSCRIBED', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -176,7 +176,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should handle connection errors and attempt reconnection', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -227,7 +227,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
       // Get the booking change handler
       const bookingHandler = mockChannel.on.mock.calls.find(
-        (call) => call[1].table === 'bookings'
+        (call: any) => call[1].table === 'bookings'
       )?.[2]
 
       // Simulate multiple rapid updates
@@ -367,7 +367,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
       // Check bookings subscription has no filter
       const bookingsSubscription = mockChannel.on.mock.calls.find(
-        (call) => call[1].table === 'bookings'
+        (call: any) => call[1].table === 'bookings'
       )
       expect(bookingsSubscription?.[1]).not.toHaveProperty('filter')
 
@@ -398,7 +398,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
       // Get the booking change handler
       const bookingHandler = mockChannel.on.mock.calls.find(
-        (call) => call[1].table === 'bookings'
+        (call: any) => call[1].table === 'bookings'
       )?.[2]
 
       // Simulate update
@@ -427,7 +427,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
   describe('RealtimeProvider Component', () => {
     it('should render children when connected', () => {
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED)
         return mockChannel
       })
@@ -446,7 +446,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should show reconnecting message when disconnected', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -472,7 +472,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should show error message on connection failure', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -497,7 +497,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     })
 
     it('should not show status indicator when connected', () => {
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED)
         return mockChannel
       })
@@ -517,7 +517,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
   describe('InstructorRealtimeProvider Component', () => {
     it('should use instructor subscription hook', () => {
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED)
         return mockChannel
       })
@@ -536,7 +536,7 @@ describe('RealtimeProvider - Unit Tests', () => {
 
   describe('AdminRealtimeProvider Component', () => {
     it('should use admin subscription hook', () => {
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED)
         return mockChannel
       })
@@ -557,7 +557,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should exponentially backoff reconnection attempts', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -610,7 +610,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should stop retrying after max attempts', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })
@@ -653,7 +653,7 @@ describe('RealtimeProvider - Unit Tests', () => {
     it('should reset reconnection count on successful connection', async () => {
       let subscribeCallback: any
 
-      mockChannel.subscribe.mockImplementation((callback) => {
+      mockChannel.subscribe.mockImplementation((callback: any) => {
         subscribeCallback = callback
         return mockChannel
       })

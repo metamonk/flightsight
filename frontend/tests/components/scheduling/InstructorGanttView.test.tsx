@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { InstructorGanttView } from '@/components/scheduling/InstructorGanttView'
@@ -23,12 +23,10 @@ vi.mock('@/lib/queries/bookings', () => ({
 
 // Mock the Gantt component to avoid complex rendering
 vi.mock('@/components/scheduling/InstructorGantt', () => ({
-  InstructorGantt: ({ 
-    instructors, 
-    availability, 
+  InstructorGantt: ({
+    instructors,
+    availability,
     bookings,
-    onItemChange,
-    onItemClick,
   }: any) => (
     <div data-testid="instructor-gantt">
       <div data-testid="instructors-count">{instructors.length}</div>
@@ -40,20 +38,12 @@ vi.mock('@/components/scheduling/InstructorGantt', () => ({
         </div>
       ))}
       {availability.map((avail: any) => (
-        <button
+        <div
           key={avail.id}
           data-testid={`availability-${avail.id}`}
-          onClick={() => onItemClick?.({
-            id: `availability-${avail.id}`,
-            featureId: avail.instructor_id,
-            start: new Date(avail.start_time),
-            end: new Date(avail.end_time),
-            title: 'Available',
-            status: 'available'
-          })}
         >
           Availability {avail.id}
-        </button>
+        </div>
       ))}
     </div>
   ),

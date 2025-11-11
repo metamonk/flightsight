@@ -493,10 +493,7 @@ describe('RadioGroup Component', () => {
 
     it('should work in forms', async () => {
       const user = userEvent.setup()
-      const handleSubmit = vi.fn((e) => {
-        e.preventDefault()
-      })
-      
+
       // Use a simpler test without form element to avoid ResizeObserver issues
       render(
         <RadioGroup name="choice" aria-label="Choose">
@@ -504,10 +501,10 @@ describe('RadioGroup Component', () => {
           <RadioGroupItem value="option2" aria-label="Option 2" />
         </RadioGroup>
       )
-      
+
       const radios = screen.getAllByRole('radio')
       await user.click(radios[1])
-      
+
       expect(radios[1]).toBeChecked()
     })
   })

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen, waitFor } from '@testing-library/react'
 import { render } from '@/tests/helpers/test-utils'
 import { mockUsers, mockBookings, mockProposals } from '@/tests/helpers/mockData'
 import { BookingsList } from '@/components/booking/BookingsList'
@@ -36,8 +35,6 @@ vi.mock('@/lib/queries/bookings', async () => {
 })
 
 describe('Booking and Proposals Integration', () => {
-  const user = userEvent.setup()
-
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -117,7 +114,7 @@ describe('Booking and Proposals Integration', () => {
     })
 
     // Accept a proposal (simulate button click)
-    mockAcceptMutation.mutate.mockImplementation((proposalId, options) => {
+    mockAcceptMutation.mutate.mockImplementation((_proposalId: any, options: any) => {
       // Simulate successful mutation
       if (options?.onSuccess) {
         options.onSuccess()
@@ -192,7 +189,7 @@ describe('Booking and Proposals Integration', () => {
     })
 
     // Simulate rejection
-    mockRejectMutation.mutate.mockImplementation((proposalId, options) => {
+    mockRejectMutation.mutate.mockImplementation((_proposalId: any, options: any) => {
       if (options?.onSuccess) {
         options.onSuccess()
       }

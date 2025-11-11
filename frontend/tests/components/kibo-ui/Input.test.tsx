@@ -476,7 +476,6 @@ describe("Complex Compositions", () => {
 
   it("renders SearchInput with glow", () => {
     const { container } = render(<SearchInput placeholder="Search" withGlow />);
-    const glowLayer = container.querySelector('[aria-hidden="true"]');
     // Should have both icon and glow layer with aria-hidden
     expect(container.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThanOrEqual(1);
   });

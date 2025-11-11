@@ -1,4 +1,4 @@
-import type { Database } from '@/lib/types/database'
+import type { Database } from '@/lib/types/database.types'
 
 type Booking = Database['public']['Tables']['bookings']['Row']
 type RescheduleProposal = Database['public']['Tables']['reschedule_proposals']['Row']

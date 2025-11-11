@@ -376,7 +376,7 @@ describe('DataGrid Component', () => {
         {
           key: 'name',
           label: 'Name',
-          render: (value, row, index) => (
+          render: (_value, row, index) => (
             <span>{`${index + 1}. ${row.name} (${row.role})`}</span>
           ),
         },

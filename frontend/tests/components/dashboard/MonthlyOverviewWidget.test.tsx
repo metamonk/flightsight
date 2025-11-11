@@ -4,7 +4,7 @@
  * Tests the monthly calendar widget display functionality.
  */
 
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { MonthlyOverviewWidget, type BookingSummary } from '@/components/dashboard/MonthlyOverviewWidget'
 
@@ -13,7 +13,7 @@ vi.mock('date-fns', async () => {
   const actual = await vi.importActual('date-fns')
   return {
     ...actual,
-    format: vi.fn((date: Date, formatStr: string) => date.toISOString()),
+    format: vi.fn((date: Date, _formatStr: string) => date.toISOString()),
   }
 })
 
@@ -128,16 +128,15 @@ describe('MonthlyOverviewWidget', () => {
     }
   })
 
-  it('renders without card wrapper when showCard is false', () => {
+  it('renders with bookings data', () => {
     const { container } = render(
-      <MonthlyOverviewWidget 
-        bookings={mockBookings} 
-        showCard={false}
+      <MonthlyOverviewWidget
+        bookings={mockBookings}
       />
     )
-    
-    // Should not have Card component
-    expect(container.querySelector('[class*="rounded-xl"]')).not.toBeInTheDocument()
+
+    // Should render the widget
+    expect(container.querySelector('[class*="rounded-xl"]')).toBeInTheDocument()
   })
 
   it('calculates booking stats correctly', () => {

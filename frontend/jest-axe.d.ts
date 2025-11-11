@@ -8,6 +8,10 @@ declare module 'jest-axe' {
     globalOptions?: any
     impactLevels?: string[]
     resultTypes?: string[]
+    runOnly?: {
+      type: 'tag' | 'rule'
+      values: string[]
+    }
   }
 
   export interface AxeResults {

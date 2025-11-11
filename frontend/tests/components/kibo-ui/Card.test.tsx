@@ -235,7 +235,7 @@ describe('Card Component', () => {
     })
 
     it('should apply correct variant colors', () => {
-      const { container } = render(
+      render(
         <div>
           <CardStat label="Primary" value="Value1" variant="primary" />
           <CardStat label="Accent" value="Value2" variant="accent" />

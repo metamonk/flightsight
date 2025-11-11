@@ -261,8 +261,6 @@ describe('ProposalAccordion', () => {
 
   describe('Proposals Display', () => {
     it('sorts proposals by score in descending order', async () => {
-      const user = userEvent.setup()
-      
       render(
         <ProposalAccordion
           conflict={mockConflict}
@@ -280,8 +278,6 @@ describe('ProposalAccordion', () => {
     })
 
     it('displays empty state when no proposals exist', async () => {
-      const user = userEvent.setup()
-      
       render(
         <ProposalAccordion
           conflict={mockConflict}

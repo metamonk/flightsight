@@ -1,5 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
 import { describe, it, expect, vi } from "vitest";
 import {
@@ -12,6 +11,7 @@ import {
   SelectGroup,
   SelectSeparator,
   SelectField,
+  type SelectTriggerProps,
 } from "@/components/kibo-ui/select";
 
 expect.extend(toHaveNoViolations);
@@ -22,7 +22,7 @@ describe("Select Component", () => {
     ...props
   }: {
     onValueChange?: (value: string) => void;
-  }) => (
+  } & Omit<SelectTriggerProps, 'children'>) => (
     <Select onValueChange={onValueChange}>
       <SelectTrigger {...props}>
         <SelectValue placeholder="Select an option" />
@@ -232,6 +232,8 @@ describe("SelectField Component", () => {
   }: {
     label: string;
     onValueChange?: (value: string) => void;
+    helperText?: string;
+    error?: string;
   }) => (
     <SelectField {...props} onValueChange={onValueChange}>
       <SelectItem value="option1">Option 1</SelectItem>

@@ -111,7 +111,10 @@ describe('Checkbox Component', () => {
         const [checked, setChecked] = React.useState(false)
         return (
           <>
-            <Checkbox checked={checked} onCheckedChange={setChecked} />
+            <Checkbox
+              checked={checked}
+              onCheckedChange={(value) => setChecked(value === true)}
+            />
             <span data-testid="state">{checked.toString()}</span>
           </>
         )
