@@ -107,7 +107,7 @@ export interface DataGridProps<T = any> {
   /** Row double-click handler */
   onRowDoubleClick?: (row: T, index: number) => void;
   /** Get unique row ID */
-  getRowId?: (row: T) => string | number;
+  getRowId?: (row: T, index: number) => string | number;
   /** Loading state */
   loading?: boolean;
   /** Empty state message */
@@ -270,20 +270,18 @@ export function DataGrid<T = any>({
   };
 
   const handleSelectRow = (rowId: string | number) => {
-    setSelectedRows((prev) => {
-      const newSet = new Set(prev);
-      if (selectionMode === "single") {
-        newSet.clear();
-        newSet.add(rowId);
+    const newSet = new Set(selectedRows);
+    if (selectionMode === "single") {
+      newSet.clear();
+      newSet.add(rowId);
+    } else {
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
       } else {
-        if (newSet.has(rowId)) {
-          newSet.delete(rowId);
-        } else {
-          newSet.add(rowId);
-        }
+        newSet.add(rowId);
       }
-      return newSet;
-    });
+    }
+    setSelectedRows(newSet);
   };
 
   const handlePageChange = (page: number) => {
