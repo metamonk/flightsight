@@ -111,17 +111,17 @@ function transformToGanttFeatures(
     )
     
     // Create features for available slots
-    const availableFeatures: KiboGanttFeature[] = instructorAvailability
+    const availableFeatures = instructorAvailability
       .map(avail => {
         const startDate = new Date(avail.start_time)
         const endDate = new Date(avail.end_time)
-        
+
         // Validate dates
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           console.warn(`Invalid dates for availability ${avail.id}:`, avail.start_time, avail.end_time)
           return null
         }
-        
+
         return {
           id: `availability-${avail.id}`,
           name: `${instructor.full_name} - Available`,
@@ -131,20 +131,20 @@ function transformToGanttFeatures(
           lane: instructor.id // Group by instructor
         }
       })
-      .filter((f): f is KiboGanttFeature => f !== null)
+      .filter((f): f is NonNullable<typeof f> => f !== null)
     
     // Create features for booked slots
-    const bookedFeatures: KiboGanttFeature[] = instructorBookings
+    const bookedFeatures = instructorBookings
       .map((booking: any) => {
         const startDate = new Date(booking.scheduled_start)
         const endDate = new Date(booking.scheduled_end)
-        
+
         // Validate dates
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           console.warn(`Invalid dates for booking ${booking.id}:`, booking.scheduled_start, booking.scheduled_end)
           return null
         }
-        
+
         return {
           id: `booking-${booking.id}`,
           name: `${instructor.full_name} - ${booking.lesson_type}`,
@@ -154,7 +154,7 @@ function transformToGanttFeatures(
           lane: instructor.id // Group by instructor
         }
       })
-      .filter((f): f is KiboGanttFeature => f !== null)
+      .filter((f): f is NonNullable<typeof f> => f !== null)
     
     return [...availableFeatures, ...bookedFeatures]
   })

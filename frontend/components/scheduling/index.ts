@@ -13,11 +13,10 @@ export { InstructorCalendarView } from './InstructorCalendarView'
 
 // Export types
 export type { ScheduleXCalendarProps } from './ScheduleXCalendar'
-export type { 
+export type {
   InstructorGanttProps,
   InstructorAvailability,
   Instructor as GanttInstructor,
-  GanttFeature,
   GanttItem
 } from './InstructorGantt'
 export type { InstructorGanttViewProps } from './InstructorGanttView'

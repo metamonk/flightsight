@@ -36,8 +36,15 @@ export function useAllInstructorsAvailability() {
       const { data, error } = await supabase
         .from('availability')
         .select(`
-          *,
-          users!availability_user_id_fkey (
+          id,
+          user_id,
+          day_of_week,
+          start_time,
+          end_time,
+          is_recurring,
+          created_at,
+          updated_at,
+          users:user_id (
             id,
             full_name,
             email

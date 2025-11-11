@@ -62,20 +62,20 @@ export function InstructorCalendarView({
   // Transform bookings to Schedule-X events
   const calendarEvents = useMemo(() => {
     if (!bookings) return []
-    return transformBookingsToEvents(bookings as BookingData[], conflicts || [])
+    return transformBookingsToEvents(bookings as any as BookingData[], conflicts as any || [])
   }, [bookings, conflicts])
   
   // Transform weather conflicts to background events
   const backgroundEvents = useMemo(() => {
     if (!conflicts) return []
-    return transformConflictsToBackground(conflicts)
+    return transformConflictsToBackground(conflicts as any)
   }, [conflicts])
   
   /**
    * Handle event click - navigate to booking details
    */
   const handleEventClick = useCallback((event: CalendarEvent) => {
-    const bookingId = event._customContent?.bookingId || event.id
+    const bookingId = (event._customContent as any)?.bookingId || event.id
     
     // Navigate to booking detail page
     router.push(`/dashboard/booking/${bookingId}`)

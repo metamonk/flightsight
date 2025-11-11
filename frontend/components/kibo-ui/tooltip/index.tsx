@@ -30,14 +30,11 @@ export type TooltipProps = React.ComponentPropsWithoutRef<
   delayDuration?: number;
 };
 
-const Tooltip = React.forwardRef<
-  React.ElementRef<typeof TooltipPrimitive.Root>,
-  TooltipProps
->(({ delayDuration = 200, children, ...props }, _ref) => (
+const Tooltip: React.FC<TooltipProps> = ({ delayDuration = 200, children, ...props }) => (
   <TooltipProvider delayDuration={delayDuration}>
     <TooltipRoot {...props}>{children}</TooltipRoot>
   </TooltipProvider>
-));
+);
 Tooltip.displayName = "Tooltip";
 
 export type TooltipContentProps = React.ComponentPropsWithoutRef<
@@ -143,25 +140,20 @@ export type TooltipSimpleProps = {
   withHUD?: boolean;
 };
 
-const TooltipSimple = React.forwardRef<HTMLElement, TooltipSimpleProps>(
-  (
-    {
-      content,
-      children,
-      side = "top",
-      delayDuration = 200,
-      showArrow = true,
-      withHUD = false,
-    },
-    _ref
-  ) => (
-    <Tooltip delayDuration={delayDuration}>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={side} showArrow={showArrow} withHUD={withHUD}>
-        {content}
-      </TooltipContent>
-    </Tooltip>
-  )
+const TooltipSimple: React.FC<TooltipSimpleProps> = ({
+  content,
+  children,
+  side = "top",
+  delayDuration = 200,
+  showArrow = true,
+  withHUD = false,
+}) => (
+  <Tooltip delayDuration={delayDuration}>
+    <TooltipTrigger asChild>{children}</TooltipTrigger>
+    <TooltipContent side={side} showArrow={showArrow} withHUD={withHUD}>
+      {content}
+    </TooltipContent>
+  </Tooltip>
 );
 TooltipSimple.displayName = "TooltipSimple";
 

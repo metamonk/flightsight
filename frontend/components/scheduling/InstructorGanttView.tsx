@@ -68,10 +68,10 @@ export function InstructorGanttView({
   } = useAllInstructorsAvailability()
   
   // Fetch bookings to show booked time slots
-  const { 
-    data: bookings, 
-    isLoading: bookingsLoading 
-  } = useInstructorBookings(instructorId)
+  const {
+    data: bookings,
+    isLoading: bookingsLoading
+  } = useInstructorBookings(instructorId || '')
   
   // Mutation for updating availability
   const updateAvailability = useUpdateAvailability()

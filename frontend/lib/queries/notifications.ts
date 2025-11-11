@@ -9,14 +9,14 @@ export function useNotifications(userId: string) {
     queryKey: ['notifications', userId],
     queryFn: async () => {
       const supabase = createClient()
-      
+
       const { data, error } = await supabase
         .from('notifications')
-        .select('*')
+        .select('id, user_id, type, title, message, status, metadata, created_at, read_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(50)
-      
+
       if (error) throw error
       return data
     },

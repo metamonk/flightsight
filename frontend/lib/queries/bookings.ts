@@ -258,14 +258,32 @@ export function useInstructorBookings(instructorId: string) {
       if (!instructorId) {
         return []
       }
-      
+
       const { data, error } = await supabase
         .from('bookings')
         .select(`
-          *,
-          student:users!bookings_student_id_fkey(id, full_name, email, avatar_url),
-          instructor:users!bookings_instructor_id_fkey(id, full_name, email, avatar_url),
-          aircraft(*)
+          id,
+          student_id,
+          instructor_id,
+          aircraft_id,
+          status,
+          scheduled_start,
+          scheduled_end,
+          actual_start,
+          actual_end,
+          departure_airport_id,
+          destination_airport_id,
+          lesson_type_id,
+          notes,
+          hobbs_start,
+          hobbs_end,
+          flight_time,
+          ground_time,
+          created_at,
+          updated_at,
+          student:student_id(id, full_name, email, avatar_url),
+          instructor:instructor_id(id, full_name, email, avatar_url),
+          aircraft:aircraft_id(id, tail_number, make, model, year)
         `)
         .eq('instructor_id', instructorId)
         .gte('scheduled_start', new Date().toISOString())
