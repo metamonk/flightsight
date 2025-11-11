@@ -343,8 +343,14 @@ export function InstructorGanttView({
             bookings={bookings || []}
             resizable={editable}
             draggable={editable}
-            onItemChange={handleItemChange}
-            onItemClick={handleItemClick}
+            onItemMove={(id: string, startAt: Date, endAt: Date | null) => {
+              if (endAt) {
+                handleItemChange({ id, start: startAt, end: endAt } as any)
+              }
+            }}
+            onSelectItem={(id: string) => {
+              handleItemClick({ id } as any)
+            }}
             className="border rounded-lg"
           />
         </div>

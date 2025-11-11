@@ -89,7 +89,7 @@ export function transformBookingToEvent(
     end,
     description,
     calendarId: getCalendarCategoryId(booking.status, hasWeatherConflict),
-    
+
     // Store original data for later use
     _customContent: {
       bookingId: booking.id,
@@ -105,7 +105,7 @@ export function transformBookingToEvent(
       studentAvatar: booking.student.avatar_url,
       instructorAvatar: booking.instructor?.avatar_url
     }
-  }
+  } as any
 }
 
 /**
@@ -149,10 +149,10 @@ export function transformConflictToBackground(
     start,
     end,
     description,
-    
+
     // Use weatherConflict calendar category for special styling
     calendarId: 'weatherConflict' as const,
-    
+
     // Background event styling
     _customContent: {
       isBackground: true,
@@ -160,7 +160,7 @@ export function transformConflictToBackground(
       bookingId: conflict.booking_id,
       weatherReasons: conflict.conflict_reasons
     }
-  }
+  } as any
 }
 
 /**

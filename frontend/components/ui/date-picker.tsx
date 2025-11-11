@@ -52,8 +52,8 @@ function DatePicker({
       <PopoverContent className={cn("w-auto p-0", className)} align="start">
         <Calendar
           mode="single"
-          selected={date}
-          onSelect={onSelect}
+          selected={date as any}
+          onSelect={onSelect as any}
           initialFocus
           {...calendarProps}
         />

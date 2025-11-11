@@ -182,7 +182,7 @@ export function WeatherConflictOverlay({
                 <div className="pt-2 border-t">
                   <div className="text-xs font-medium mb-1">Reasons:</div>
                   <ul className="text-xs space-y-0.5 text-muted-foreground">
-                    {position.conflict.weather_reasons.map((reason, idx) => (
+                    {position.conflict.conflict_reasons.map((reason: string, idx: number) => (
                       <li key={idx}>• {reason}</li>
                     ))}
                   </ul>

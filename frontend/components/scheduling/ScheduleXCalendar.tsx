@@ -113,16 +113,16 @@ export function ScheduleXCalendarWrapper({
     ...defaultCalendarConfig,
     defaultView,
     selectedDate: parsedDate,
-    timezone: getUserTimezone(),
-    views: calendarViews,
+    timezone: getUserTimezone() as any,
+    views: calendarViews as any,
     calendars: calendarCategories,
     events: [...events, ...backgroundEvents],
-    callbacks: mergedCallbacks,
+    callbacks: mergedCallbacks as any,
     plugins: [
       eventsService,
       ...(dragDropPlugin ? [dragDropPlugin] : [])
     ].filter(Boolean)
-  })
+  } as any)
   
   // Update events when props change
   useEffect(() => {
@@ -164,10 +164,8 @@ export function ScheduleXCalendarWrapper({
         isolation: 'isolate' // Create stacking context to contain absolute elements
       }}
     >
-      <ScheduleXCalendar 
-        calendarApp={calendar}
-        // Apply our custom theme class
-        className="sx-react-calendar-wrapper"
+      <ScheduleXCalendar
+        {...({ calendarApp: calendar, className: "sx-react-calendar-wrapper" } as any)}
       />
     </div>
   )

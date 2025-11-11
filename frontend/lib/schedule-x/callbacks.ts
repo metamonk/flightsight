@@ -6,7 +6,7 @@
  */
 
 import type { CalendarEvent } from '@schedule-x/calendar'
-import type { Temporal } from 'temporal-polyfill'
+import { Temporal } from 'temporal-polyfill'
 
 /**
  * Callback function types
